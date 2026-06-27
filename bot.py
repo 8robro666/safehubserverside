@@ -193,63 +193,68 @@ async def unverify_user(ctx, member: discord.Member = None):
 
 @bot.command(name='generatekey')
 async def generate_key(ctx):
-    user_id = str(ctx.author.id)
-    
-    can_generate, message = can_generate_key(user_id)
-    if not can_generate:
-        embed = discord.Embed(
-            title="Cooldown Active",
-            description=message,
-            color=discord.Color.orange()
-        )
-        await ctx.send(embed=embed)
-        return
-    
-    keys = load_keys()
-    
-    key = generate_key()
-    while key in keys:
+    try:
+        user_id = str(ctx.author.id)
+        
+        can_generate, message = can_generate_key(user_id)
+        if not can_generate:
+            embed = discord.Embed(
+                title="Cooldown Active",
+                description=message,
+                color=discord.Color.orange()
+            )
+            await ctx.send(embed=embed)
+            return
+        
+        keys = load_keys()
+        
         key = generate_key()
-    
-    expiry = datetime.datetime.now() + datetime.timedelta(days=30)
-    
-    keys[key] = {
-        'created_by': str(ctx.author),
-        'user_id': user_id,
-        'created_at': datetime.datetime.now().isoformat(),
-        'expires_at': expiry.isoformat(),
-        'max_uses': 1,
-        'uses': 0,
-        'active': True,
-        'duration_days': 30
-    }
-    
-    save_keys(keys)
-    update_last_generate(user_id)
-    
-    sent = await send_private_key(ctx.author, key, expiry)
-    
-    if sent:
-        embed = discord.Embed(
-            title="Key Generated Successfully",
-            description="Your access key has been sent to your DMs. Please check your private messages.",
-            color=discord.Color.green()
-        )
-        embed.add_field(name="Cooldown", value=f"You can generate another key in {COOLDOWN_HOURS} hours", inline=False)
-        await ctx.send(embed=embed)
-    else:
-        embed = discord.Embed(
-            title="Key Generated",
-            description="Could not send key via DM. Please enable DMs and try again, or contact an admin.",
-            color=discord.Color.orange()
-        )
-        embed.add_field(
-            name="Your Key",
-            value=f"`{key}`",
-            inline=False
-        )
-        embed.add_field(name="Expires", value=expiry.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
-        await ctx.send(embed=embed)
+        while key in keys:
+            key = generate_key()
+        
+        expiry = datetime.datetime.now() + datetime.timedelta(days=30)
+        
+        keys[key] = {
+            'created_by': str(ctx.author),
+            'user_id': user_id,
+            'created_at': datetime.datetime.now().isoformat(),
+            'expires_at': expiry.isoformat(),
+            'max_uses': 1,
+            'uses': 0,
+            'active': True,
+            'duration_days': 30
+        }
+        
+        save_keys(keys)
+        update_last_generate(user_id)
+        
+        sent = await send_private_key(ctx.author, key, expiry)
+        
+        if sent:
+            embed = discord.Embed(
+                title="Key Generated Successfully",
+                description="Your access key has been sent to your DMs. Please check your private messages.",
+                color=discord.Color.green()
+            )
+            embed.add_field(name="Cooldown", value=f"You can generate another key in {COOLDOWN_HOURS} hours", inline=False)
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(
+                title="Key Generated - DM Failed",
+                description="Could not send key via DM. Please enable DMs and try again, or contact an admin.",
+                color=discord.Color.orange()
+            )
+            embed.add_field(
+                name="Your Key",
+                value=f"`{key}`",
+                inline=False
+            )
+            embed.add_field(name="Expires", value=expiry.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
+            await ctx.send(embed=embed)
+            
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
+        print(f"Error in generatekey: {e}")
 
 @bot.command(name='help')
 async def help_command(ctx):
@@ -394,6 +399,10 @@ async def revoke_user_keys(ctx, member: discord.Member = None):
             pass
     else:
         await ctx.send(f"{member.mention} has no active keys.")
+
+@bot.command(name='test')
+async def test_command(ctx):
+    await ctx.send("Bot is working! Use !generatekey to generate a key.")
 
 # Get Discord token from environment variable
 discord_token = os.getenv('DISCORD_TOKEN')
