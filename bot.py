@@ -15,7 +15,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
 # Railway backend URL
-RAILWAY_API_URL = 'safehub-backend-production.up.railway.app'
+RAILWAY_API_URL = 'https://safehub-backend-production.up.railway.app'
 KEY_LENGTH = 16
 COOLDOWN_HOURS = 24
 
