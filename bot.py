@@ -15,11 +15,11 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
 # Railway backend URL
-RAILWAY_API_URL = 'https://safehub-backend-production.up.railway.app'
+RAILWAY_API_URL = 'safehub-backend-production.up.railway.app'
 KEY_LENGTH = 16
 COOLDOWN_HOURS = 24
 
-# Local files for verification only
+# Local file for verification only
 VERIFIED_FILE = 'verified.json'
 
 def load_verified():
@@ -287,7 +287,6 @@ async def help(ctx):
 @bot.command()
 async def mykey(ctx):
     try:
-        # Get keys from Railway
         async with aiohttp.ClientSession() as session:
             async with session.get(f'{RAILWAY_API_URL}/api/keys') as response:
                 if response.status == 200:
@@ -348,7 +347,6 @@ async def listverified(ctx):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def revokekey(ctx, key: str):
-    # Revoke key via Railway API
     try:
         async with aiohttp.ClientSession() as session:
             payload = {'key': key}
