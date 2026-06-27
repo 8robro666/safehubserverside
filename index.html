@@ -1066,6 +1066,8 @@
     </div>
 
     <script>
+        const API_BASE_URL = 'https://safehub-backend-production.up.railway.app';
+
         let validated = false;
         let socket = null;
         let serverData = { servers: [] };
@@ -1101,7 +1103,7 @@
             loginBtn.textContent = 'Validating...';
 
             try {
-                const response = await fetch('/api/validate', {
+                const response = await fetch(`${API_BASE_URL}/api/validate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1137,7 +1139,7 @@
                 }
             } catch (error) {
                 console.error('Validation error:', error);
-                showStatus('Network error: ' + error.message + '. Make sure the backend server is running on port 8080.', 'error');
+                showStatus('Network error: ' + error.message + '. Make sure the backend server is running.', 'error');
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Access Dashboard';
             }
@@ -1174,7 +1176,8 @@
 
         function connectWebSocket() {
             try {
-                socket = new WebSocket('ws://localhost:8080');
+                const wsUrl = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+                socket = new WebSocket(wsUrl);
                 
                 socket.onopen = function() {
                     document.getElementById('connectionStatus').textContent = '● Connected';
@@ -1207,7 +1210,7 @@
 
         function startPolling() {
             setInterval(function() {
-                fetch('/api/servers')
+                fetch(`${API_BASE_URL}/api/servers`)
                     .then(res => res.json())
                     .then(data => handleServerData(data))
                     .catch(err => console.log('[Safe Hub] Polling error:', err));
