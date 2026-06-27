@@ -47,10 +47,12 @@ def generate_key():
 
 def can_generate_key(user_id):
     verified = load_verified()
-    if str(user_id) not in verified:
+    user_id_str = str(user_id)
+    
+    if user_id_str not in verified:
         return False, "You are not verified. Ask an admin to verify you."
     
-    data = verified[str(user_id)]
+    data = verified[user_id_str]
     
     if 'last_generate' not in data:
         return True, ""
@@ -68,8 +70,9 @@ def can_generate_key(user_id):
 
 def update_last_generate(user_id):
     verified = load_verified()
-    if str(user_id) in verified:
-        verified[str(user_id)]['last_generate'] = datetime.datetime.now().isoformat()
+    user_id_str = str(user_id)
+    if user_id_str in verified:
+        verified[user_id_str]['last_generate'] = datetime.datetime.now().isoformat()
         save_verified(verified)
 
 @bot.event
