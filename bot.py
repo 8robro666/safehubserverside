@@ -5,6 +5,8 @@ import random
 import string
 import datetime
 import os
+import aiohttp
+import asyncio
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -12,22 +14,13 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
-KEYS_FILE = 'keys.json'
-VERIFIED_FILE = 'verified.json'
+# Railway backend URL
+RAILWAY_API_URL = 'https://safehub-backend-production.up.railway.app'
 KEY_LENGTH = 16
 COOLDOWN_HOURS = 24
 
-def load_keys():
-    if not os.path.exists(KEYS_FILE):
-        with open(KEYS_FILE, 'w') as f:
-            json.dump({}, f)
-        return {}
-    with open(KEYS_FILE, 'r') as f:
-        return json.load(f)
-
-def save_keys(keys):
-    with open(KEYS_FILE, 'w') as f:
-        json.dump(keys, f, indent=4)
+# Local files for verification only
+VERIFIED_FILE = 'verified.json'
 
 def load_verified():
     if not os.path.exists(VERIFIED_FILE):
@@ -74,14 +67,24 @@ def update_last_generate(user_id):
         verified[user_id_str]['last_generate'] = datetime.datetime.now().isoformat()
         save_verified(verified)
 
-@bot.event
-async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
-    print(f'Bot is in {len(bot.guilds)} guilds')
-    await bot.change_presence(activity=discord.Activity(
-        type=discord.ActivityType.watching, 
-        name="Safe Hub Keys"
-    ))
+async def add_key_to_railway(key, user_id, username):
+    """Send the generated key to Railway backend"""
+    try:
+        async with aiohttp.ClientSession() as session:
+            payload = {
+                'key': key,
+                'userId': str(user_id),
+                'username': username,
+                'maxUses': 1
+            }
+            async with session.post(f'{RAILWAY_API_URL}/api/addkey', json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data.get('success', False)
+                return False
+    except Exception as e:
+        print(f'Error adding key to Railway: {e}')
+        return False
 
 async def send_private_key(user, key, expiry):
     try:
@@ -121,6 +124,15 @@ async def send_private_key(user, key, expiry):
         return True
     except discord.Forbidden:
         return False
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+    print(f'Bot is in {len(bot.guilds)} guilds')
+    await bot.change_presence(activity=discord.Activity(
+        type=discord.ActivityType.watching, 
+        name="Safe Hub Keys"
+    ))
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -200,26 +212,16 @@ async def generatekey(ctx):
             await ctx.send(embed=embed)
             return
         
-        keys = load_keys()
-        
         key = generate_key()
-        while key in keys:
-            key = generate_key()
-        
         expiry = datetime.datetime.now() + datetime.timedelta(days=30)
         
-        keys[key] = {
-            'created_by': str(ctx.author),
-            'user_id': user_id,
-            'created_at': datetime.datetime.now().isoformat(),
-            'expires_at': expiry.isoformat(),
-            'max_uses': 1,
-            'uses': 0,
-            'active': True,
-            'duration_days': 30
-        }
+        # Add key to Railway backend
+        success = await add_key_to_railway(key, user_id, str(ctx.author))
         
-        save_keys(keys)
+        if not success:
+            await ctx.send("Failed to save key to backend. Please try again later.")
+            return
+        
         update_last_generate(user_id)
         
         sent = await send_private_key(ctx.author, key, expiry)
@@ -235,13 +237,8 @@ async def generatekey(ctx):
         else:
             embed = discord.Embed(
                 title="Key Generated - DM Failed",
-                description="Could not send key via DM. Please enable DMs and try again, or contact an admin.",
+                description=f"Could not send key via DM. Your key is: `{key}`",
                 color=discord.Color.orange()
-            )
-            embed.add_field(
-                name="Your Key",
-                value=f"`{key}`",
-                inline=False
             )
             embed.add_field(name="Expires", value=expiry.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
             await ctx.send(embed=embed)
@@ -290,26 +287,30 @@ async def help(ctx):
 @bot.command()
 async def mykey(ctx):
     try:
-        keys = load_keys()
-        user_id = str(ctx.author.id)
-        
-        user_keys = []
-        for key, data in keys.items():
-            if data.get('user_id') == user_id and data['active']:
-                expiry = datetime.datetime.fromisoformat(data['expires_at'])
-                if expiry > datetime.datetime.now():
-                    user_keys.append(key)
-        
-        if not user_keys:
-            await ctx.send("You don't have any active keys. Use `!generatekey` to create one.")
-            return
-        
-        try:
-            for key in user_keys:
-                await ctx.author.send(f"Your active key: `{key}`")
-            await ctx.send("Your active keys have been sent to your DMs.")
-        except discord.Forbidden:
-            await ctx.send(f"Could not send keys via DM. Please enable DMs. Your keys: {', '.join([f'`{k}`' for k in user_keys])}")
+        # Get keys from Railway
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'{RAILWAY_API_URL}/api/keys') as response:
+                if response.status == 200:
+                    data = await response.json()
+                    user_id = str(ctx.author.id)
+                    user_keys = []
+                    
+                    for key_data in data.get('keys', []):
+                        if key_data.get('user_id') == user_id and key_data.get('active', False):
+                            user_keys.append(key_data.get('key'))
+                    
+                    if not user_keys:
+                        await ctx.send("You don't have any active keys. Use `!generatekey` to create one.")
+                        return
+                    
+                    try:
+                        for key in user_keys:
+                            await ctx.author.send(f"Your active key: `{key}`")
+                        await ctx.send("Your active keys have been sent to your DMs.")
+                    except discord.Forbidden:
+                        await ctx.send(f"Could not send keys via DM. Your keys: {', '.join([f'`{k}`' for k in user_keys])}")
+                else:
+                    await ctx.send("Could not fetch keys from backend.")
     except Exception as e:
         await ctx.send(f"An error occurred: {str(e)}")
         print(f"Error in mykey: {e}")
@@ -347,29 +348,27 @@ async def listverified(ctx):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def revokekey(ctx, key: str):
-    keys = load_keys()
-    
-    if key not in keys:
-        await ctx.send("Key not found.")
-        return
-    
-    user_id = keys[key].get('user_id')
-    keys[key]['active'] = False
-    save_keys(keys)
-    
-    embed = discord.Embed(
-        title="Key Revoked",
-        description=f"Key `{key}` has been revoked.",
-        color=discord.Color.red()
-    )
-    await ctx.send(embed=embed)
-    
-    if user_id:
-        try:
-            user = await bot.fetch_user(int(user_id))
-            await user.send(f"Your key `{key}` has been revoked by an administrator.")
-        except:
-            pass
+    # Revoke key via Railway API
+    try:
+        async with aiohttp.ClientSession() as session:
+            payload = {'key': key}
+            async with session.post(f'{RAILWAY_API_URL}/api/revokekey', json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data.get('success'):
+                        embed = discord.Embed(
+                            title="Key Revoked",
+                            description=f"Key `{key}` has been revoked.",
+                            color=discord.Color.red()
+                        )
+                        await ctx.send(embed=embed)
+                    else:
+                        await ctx.send(f"Failed to revoke key: {data.get('reason', 'Unknown error')}")
+                else:
+                    await ctx.send("Failed to connect to backend.")
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
+        print(f"Error in revokekey: {e}")
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -378,30 +377,26 @@ async def revokeuserkeys(ctx, member: discord.Member = None):
         await ctx.send("Please specify a user. Usage: `!revokeuserkeys @user`")
         return
     
-    keys = load_keys()
-    user_id = str(member.id)
-    revoked = 0
-    
-    for key, data in keys.items():
-        if data.get('user_id') == user_id and data['active']:
-            keys[key]['active'] = False
-            revoked += 1
-    
-    if revoked > 0:
-        save_keys(keys)
-        embed = discord.Embed(
-            title="Keys Revoked",
-            description=f"Revoked {revoked} keys for {member.mention}",
-            color=discord.Color.red()
-        )
-        await ctx.send(embed=embed)
-        
-        try:
-            await member.send(f"All your active keys have been revoked by an administrator.")
-        except:
-            pass
-    else:
-        await ctx.send(f"{member.mention} has no active keys.")
+    try:
+        async with aiohttp.ClientSession() as session:
+            payload = {'userId': str(member.id)}
+            async with session.post(f'{RAILWAY_API_URL}/api/revokeuserkeys', json=payload) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data.get('success'):
+                        embed = discord.Embed(
+                            title="Keys Revoked",
+                            description=f"Revoked keys for {member.mention}",
+                            color=discord.Color.red()
+                        )
+                        await ctx.send(embed=embed)
+                    else:
+                        await ctx.send(f"Failed to revoke keys: {data.get('reason', 'Unknown error')}")
+                else:
+                    await ctx.send("Failed to connect to backend.")
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
+        print(f"Error in revokeuserkeys: {e}")
 
 @bot.command()
 async def test(ctx):
