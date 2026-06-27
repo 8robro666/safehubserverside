@@ -4,14 +4,13 @@ import json
 import random
 import string
 import datetime
-import asyncio
-import aiohttp
 import os
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
+
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 KEYS_FILE = 'keys.json'
 VERIFIED_FILE = 'verified.json'
@@ -84,11 +83,6 @@ async def on_ready():
         name="Safe Hub Keys"
     ))
 
-def is_admin():
-    async def predicate(ctx):
-        return ctx.author.guild_permissions.administrator
-    return commands.check(predicate)
-
 async def send_private_key(user, key, expiry):
     try:
         embed = discord.Embed(
@@ -128,9 +122,9 @@ async def send_private_key(user, key, expiry):
     except discord.Forbidden:
         return False
 
-@bot.command(name='verify')
-@is_admin()
-async def verify_user(ctx, member: discord.Member = None):
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def verify(ctx, member: discord.Member = None):
     if member is None:
         await ctx.send("Please specify a user to verify. Usage: `!verify @user`")
         return
@@ -162,9 +156,9 @@ async def verify_user(ctx, member: discord.Member = None):
     except discord.Forbidden:
         await ctx.send(f"Could not DM {member.mention}. Please ensure they have DMs enabled.")
 
-@bot.command(name='unverify')
-@is_admin()
-async def unverify_user(ctx, member: discord.Member = None):
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def unverify(ctx, member: discord.Member = None):
     if member is None:
         await ctx.send("Please specify a user to unverify. Usage: `!unverify @user`")
         return
@@ -191,8 +185,8 @@ async def unverify_user(ctx, member: discord.Member = None):
     except discord.Forbidden:
         pass
 
-@bot.command(name='generatekey')
-async def generate_key(ctx):
+@bot.command()
+async def generatekey(ctx):
     try:
         user_id = str(ctx.author.id)
         
@@ -256,8 +250,8 @@ async def generate_key(ctx):
         await ctx.send(f"An error occurred: {str(e)}")
         print(f"Error in generatekey: {e}")
 
-@bot.command(name='help')
-async def help_command(ctx):
+@bot.command()
+async def help(ctx):
     embed = discord.Embed(
         title="Safe Hub Key Bot - Commands",
         description="Available commands for the Safe Hub key system",
@@ -293,8 +287,8 @@ async def help_command(ctx):
     embed.set_footer(text=f"Cooldown: {COOLDOWN_HOURS} hours per key generation")
     await ctx.send(embed=embed)
 
-@bot.command(name='mykey')
-async def my_key(ctx):
+@bot.command()
+async def mykey(ctx):
     try:
         keys = load_keys()
         user_id = str(ctx.author.id)
@@ -320,9 +314,9 @@ async def my_key(ctx):
         await ctx.send(f"An error occurred: {str(e)}")
         print(f"Error in mykey: {e}")
 
-@bot.command(name='listverified')
-@is_admin()
-async def list_verified(ctx):
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def listverified(ctx):
     verified = load_verified()
     
     if not verified:
@@ -350,9 +344,9 @@ async def list_verified(ctx):
     
     await ctx.send(embed=embed)
 
-@bot.command(name='revokekey')
-@is_admin()
-async def revoke_key_admin(ctx, key: str):
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def revokekey(ctx, key: str):
     keys = load_keys()
     
     if key not in keys:
@@ -377,9 +371,9 @@ async def revoke_key_admin(ctx, key: str):
         except:
             pass
 
-@bot.command(name='revokeuserkeys')
-@is_admin()
-async def revoke_user_keys(ctx, member: discord.Member = None):
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def revokeuserkeys(ctx, member: discord.Member = None):
     if member is None:
         await ctx.send("Please specify a user. Usage: `!revokeuserkeys @user`")
         return
@@ -409,16 +403,12 @@ async def revoke_user_keys(ctx, member: discord.Member = None):
     else:
         await ctx.send(f"{member.mention} has no active keys.")
 
-@bot.command(name='test')
-async def test_command(ctx):
+@bot.command()
+async def test(ctx):
     await ctx.send("Bot is working! Use !generatekey to generate a key.")
 
-# Get Discord token from environment variable
 discord_token = os.getenv('DISCORD_TOKEN')
 if not discord_token:
     raise ValueError("DISCORD_TOKEN environment variable is not set. Please set it in Railway.")
 
-try:
-    bot.run(discord_token)
-except Exception as e:
-    print(f"Failed to start bot: {e}")
+bot.run(discord_token)
