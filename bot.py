@@ -51,6 +51,10 @@ def can_generate_key(user_id):
         return False, "You are not verified. Ask an admin to verify you."
     
     data = verified[str(user_id)]
+    
+    if 'last_generate' not in data:
+        return True, ""
+    
     last_generate = datetime.datetime.fromisoformat(data['last_generate'])
     now = datetime.datetime.now()
     
@@ -137,8 +141,7 @@ async def verify_user(ctx, member: discord.Member = None):
     
     verified[user_id] = {
         'username': str(member),
-        'verified_at': datetime.datetime.now().isoformat(),
-        'last_generate': datetime.datetime.now().isoformat()
+        'verified_at': datetime.datetime.now().isoformat()
     }
     save_verified(verified)
     
@@ -395,4 +398,3 @@ if not discord_token:
     raise ValueError("DISCORD_TOKEN environment variable is not set. Please set it in Railway.")
 
 bot.run(discord_token)
-
