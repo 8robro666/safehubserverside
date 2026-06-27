@@ -3,8 +3,19 @@ from pydantic import BaseModel
 import json
 import os
 import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Safe Hub API")
+
+# Allow CORS so the static site (GitHub Pages or other origins) can call the API from the browser.
+# You can restrict origins in production by replacing ['*'] with a list of allowed origins.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 KEYS_FILE = "keys.json"
 
