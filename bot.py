@@ -1,3 +1,60 @@
+# Add this at the VERY TOP of bot.py
+import sys
+import importlib
+
+# Create a dummy audioop module before discord imports it
+class DummyAudioOp:
+    @staticmethod
+    def add(*args, **kwargs): return b''
+    @staticmethod
+    def adpcm2lin(*args, **kwargs): return b''
+    @staticmethod
+    def alaw2lin(*args, **kwargs): return b''
+    @staticmethod
+    def avg(*args, **kwargs): return b''
+    @staticmethod
+    def bias(*args, **kwargs): return b''
+    @staticmethod
+    def cross(*args, **kwargs): return b''
+    @staticmethod
+    def findfactor(*args, **kwargs): return b''
+    @staticmethod
+    def findfit(*args, **kwargs): return b''
+    @staticmethod
+    def findmax(*args, **kwargs): return b''
+    @staticmethod
+    def getsample(*args, **kwargs): return 0
+    @staticmethod
+    def lin2adpcm(*args, **kwargs): return (b'', 0)
+    @staticmethod
+    def lin2alaw(*args, **kwargs): return (b'', 0)
+    @staticmethod
+    def lin2ulaw(*args, **kwargs): return (b'', 0)
+    @staticmethod
+    def max(*args, **kwargs): return 0
+    @staticmethod
+    def maxpp(*args, **kwargs): return 0
+    @staticmethod
+    def minmax(*args, **kwargs): return (0, 0)
+    @staticmethod
+    def ratecv(*args, **kwargs): return (b'', 0, 0)
+    @staticmethod
+    def reverse(*args, **kwargs): return b''
+    @staticmethod
+    def rms(*args, **kwargs): return 0
+    @staticmethod
+    def tomono(*args, **kwargs): return b''
+    @staticmethod
+    def tostereo(*args, **kwargs): return b''
+    @staticmethod
+    def ulaw2lin(*args, **kwargs): return b''
+    @staticmethod
+    def byteswap(*args, **kwargs): return b''
+
+# Insert the dummy module into sys.modules BEFORE discord imports it
+sys.modules['audioop'] = DummyAudioOp()
+
+# Now import discord
 import discord
 from discord.ext import commands
 import json
