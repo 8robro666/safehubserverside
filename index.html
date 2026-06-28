@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safe Hub - Infected Games Monitor</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -952,39 +953,44 @@
             }
         }
 
-        // ==================== WEBSOCKET ====================
-        function connectWebSocket() {
+        // ==================== SOCKET.IO CONNECTION ====================
+        function connectSocketIO() {
             try {
-                socket = new WebSocket(`wss://safehub-backend-production.up.railway.app`);
+                socket = io(API_URL, {
+                    transports: ['websocket', 'polling'],
+                    reconnection: true,
+                    reconnectionAttempts: 5,
+                    reconnectionDelay: 1000
+                });
                 
-                socket.onopen = function() {
-                    console.log('[Safe Hub] WebSocket connected');
+                socket.on('connect', function() {
+                    console.log('[Safe Hub] Socket.IO connected');
                     document.getElementById('connectionStatus').textContent = '● Connected';
                     document.getElementById('connectionStatus').style.color = '#28a745';
-                };
+                });
                 
-                socket.onmessage = function(event) {
-                    try {
-                        const data = JSON.parse(event.data);
-                        console.log('[Safe Hub] WebSocket data received:', data);
-                        handleServerData(data);
-                    } catch(e) {
-                        console.error('[Safe Hub] Parse error:', e);
-                    }
-                };
+                socket.on('server_update', function(data) {
+                    console.log('[Safe Hub] Server update received:', data);
+                    handleServerData(data);
+                });
                 
-                socket.onclose = function() {
-                    console.log('[Safe Hub] WebSocket disconnected');
+                socket.on('command_result', function(data) {
+                    console.log('[Safe Hub] Command result:', data);
+                    alert('Command executed successfully!');
+                });
+                
+                socket.on('disconnect', function() {
+                    console.log('[Safe Hub] Socket.IO disconnected');
                     document.getElementById('connectionStatus').textContent = '● Disconnected';
                     document.getElementById('connectionStatus').style.color = '#dc3545';
-                    setTimeout(connectWebSocket, 3000);
-                };
+                });
                 
-                socket.onerror = function(error) {
-                    console.error('[Safe Hub] WebSocket error:', error);
-                };
+                socket.on('connect_error', function(error) {
+                    console.error('[Safe Hub] Socket.IO connection error:', error);
+                    startPolling();
+                });
             } catch(e) {
-                console.log('[Safe Hub] WebSocket unavailable, using polling');
+                console.log('[Safe Hub] Socket.IO unavailable, using polling');
                 startPolling();
             }
         }
@@ -1214,7 +1220,6 @@
                 select.value = currentValue;
             }
             
-            // Auto-select the first server if available
             if (select.options.length > 1 && !currentValue) {
                 select.selectedIndex = 1;
                 select.dispatchEvent(new Event('change'));
@@ -1225,7 +1230,6 @@
             const select = document.getElementById('playerSelect');
             select.innerHTML = '<option value="">Select a player...</option>';
             
-            // Find the server by serverId
             const server = serverData.servers.find(s => String(s.serverId) === String(serverId));
             console.log('[Safe Hub] Updating player select for server:', serverId, 'Found server:', server);
             
@@ -1308,7 +1312,6 @@
             }
 
             const commandData = {
-                action: 'command',
                 serverId: serverId,
                 player: player,
                 command: command,
@@ -1317,11 +1320,11 @@
                 timestamp: new Date().toISOString()
             };
 
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify(commandData));
-                alert(`Command "${command}" executed on ${player}`);
+            if (socket && socket.connected) {
+                socket.emit('command', commandData);
+                alert(`Command "${command}" sent to ${player}`);
             } else {
-                alert('WebSocket not connected. Command would be: ' + JSON.stringify(commandData, null, 2));
+                alert('Socket.IO not connected. Using fallback. Command would be: ' + JSON.stringify(commandData, null, 2));
             }
 
             document.getElementById('reasonInput').value = '';
@@ -1377,7 +1380,7 @@
 
         // ==================== INITIALIZATION ====================
         fetchServers();
-        connectWebSocket();
+        connectSocketIO();
         setInterval(fetchServers, 10000);
 
         console.log('[Safe Hub] Dashboard initialized');
