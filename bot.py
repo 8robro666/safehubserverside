@@ -1,3 +1,56 @@
+import sys
+import builtins
+
+if sys.version_info >= (3, 13):
+    class DummyAudioOp:
+        @staticmethod
+        def add(*args, **kwargs): return b''
+        @staticmethod
+        def adpcm2lin(*args, **kwargs): return b''
+        @staticmethod
+        def alaw2lin(*args, **kwargs): return b''
+        @staticmethod
+        def avg(*args, **kwargs): return b''
+        @staticmethod
+        def bias(*args, **kwargs): return b''
+        @staticmethod
+        def cross(*args, **kwargs): return b''
+        @staticmethod
+        def findfactor(*args, **kwargs): return b''
+        @staticmethod
+        def findfit(*args, **kwargs): return b''
+        @staticmethod
+        def findmax(*args, **kwargs): return b''
+        @staticmethod
+        def getsample(*args, **kwargs): return 0
+        @staticmethod
+        def lin2adpcm(*args, **kwargs): return (b'', 0)
+        @staticmethod
+        def lin2alaw(*args, **kwargs): return (b'', 0)
+        @staticmethod
+        def lin2ulaw(*args, **kwargs): return (b'', 0)
+        @staticmethod
+        def max(*args, **kwargs): return 0
+        @staticmethod
+        def maxpp(*args, **kwargs): return 0
+        @staticmethod
+        def minmax(*args, **kwargs): return (0, 0)
+        @staticmethod
+        def ratecv(*args, **kwargs): return (b'', 0, 0)
+        @staticmethod
+        def reverse(*args, **kwargs): return b''
+        @staticmethod
+        def rms(*args, **kwargs): return 0
+        @staticmethod
+        def tomono(*args, **kwargs): return b''
+        @staticmethod
+        def tostereo(*args, **kwargs): return b''
+        @staticmethod
+        def ulaw2lin(*args, **kwargs): return b''
+        @staticmethod
+        def byteswap(*args, **kwargs): return b''
+    builtins.audioop = DummyAudioOp()
+
 import discord
 from discord.ext import commands
 import json
@@ -11,22 +64,15 @@ import asyncio
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
+intents.voice_states = False
 
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
-# Railway backend URL
 RAILWAY_API_URL = 'https://safehub-backend-production.up.railway.app'
 KEY_LENGTH = 16
 COOLDOWN_HOURS = 24
 
-# Local file for verification only
 VERIFIED_FILE = 'verified.json'
-
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-intents.voice_states = False  # <-- ADD THIS LINE to disable voice features
-
 
 def load_verified():
     if not os.path.exists(VERIFIED_FILE):
@@ -74,7 +120,6 @@ def update_last_generate(user_id):
         save_verified(verified)
 
 async def add_key_to_railway(key, user_id, username):
-    """Send the generated key to Railway backend"""
     try:
         async with aiohttp.ClientSession() as session:
             payload = {
@@ -221,7 +266,6 @@ async def generatekey(ctx):
         key = generate_key()
         expiry = datetime.datetime.now() + datetime.timedelta(days=30)
         
-        # Add key to Railway backend
         success = await add_key_to_railway(key, user_id, str(ctx.author))
         
         if not success:
