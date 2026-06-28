@@ -1213,20 +1213,32 @@
             if (currentValue && [...select.options].some(opt => opt.value === currentValue)) {
                 select.value = currentValue;
             }
+            
+            // Auto-select the first server if available
+            if (select.options.length > 1 && !currentValue) {
+                select.selectedIndex = 1;
+                select.dispatchEvent(new Event('change'));
+            }
         }
 
         function updatePlayerSelect(serverId) {
             const select = document.getElementById('playerSelect');
             select.innerHTML = '<option value="">Select a player...</option>';
             
-            const server = serverData.servers.find(s => s.serverId === serverId);
-            if (server && server.playerNames) {
+            // Find the server by serverId
+            const server = serverData.servers.find(s => String(s.serverId) === String(serverId));
+            console.log('[Safe Hub] Updating player select for server:', serverId, 'Found server:', server);
+            
+            if (server && server.playerNames && server.playerNames.length > 0) {
                 server.playerNames.forEach(name => {
                     const option = document.createElement('option');
                     option.value = name;
                     option.textContent = name;
                     select.appendChild(option);
                 });
+                console.log('[Safe Hub] Added players:', server.playerNames);
+            } else {
+                console.log('[Safe Hub] No players found for server:', serverId);
             }
         }
 
