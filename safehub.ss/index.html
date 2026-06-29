@@ -2,580 +2,499 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safe Hub - Infected Games Command Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safe Hub - Command Center</title>
     <style>
+        /* --- RESET & BASE --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
 
         body {
-            background: #0b0e14;
+            background: #0b0d11;
+            color: #e8edf5;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
         }
 
+        /* --- LOGIN SCREEN --- */
         .login-container {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             width: 100%;
-            background: #0b0e14;
+            padding: 1.5rem;
+            background: radial-gradient(ellipse at 50% 0%, #141a26 0%, #0b0d11 70%);
         }
 
         .login-box {
             background: #141a22;
-            padding: 48px 40px;
-            border-radius: 16px;
-            border: 1px solid #2a3340;
-            max-width: 420px;
-            width: 90%;
+            padding: 2.5rem 2rem;
+            border-radius: 1.5rem;
+            border: 1px solid #2a3344;
+            max-width: 400px;
+            width: 100%;
             text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
         .login-box h1 {
-            color: #e8edf5;
-            font-size: 28px;
+            font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.25rem;
         }
-
-        .login-box h1 span {
-            color: #ff465a;
-        }
-
+        .login-box h1 span { color: #ff465a; }
         .login-box .subtitle {
-            color: #7a879a;
-            font-size: 14px;
-            margin-bottom: 4px;
+            color: #8899bb;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
         }
-
         .login-box .badge {
             display: inline-block;
             background: rgba(255, 70, 90, 0.12);
             color: #ff465a;
-            font-size: 11px;
+            font-size: 0.7rem;
             font-weight: 600;
-            padding: 4px 16px;
+            padding: 0.3rem 1rem;
             border-radius: 20px;
-            border: 1px solid rgba(255, 70, 90, 0.15);
-            margin-top: 4px;
-            margin-bottom: 20px;
-        }
-
-        .login-box .form-group {
-            margin-top: 16px;
-            margin-bottom: 16px;
-            text-align: left;
-        }
-
-        .login-box label {
-            display: block;
-            color: #a0b0c8;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 6px;
-            text-transform: uppercase;
+            border: 1px solid rgba(255, 70, 90, 0.2);
+            margin: 0.5rem 0 1.5rem;
             letter-spacing: 0.3px;
         }
 
+        .login-box .form-group {
+            text-align: left;
+            margin-bottom: 1.25rem;
+        }
+        .login-box label {
+            display: block;
+            color: #a0b0c8;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
         .login-box input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 0.8rem 1rem;
             background: #1a222e;
-            border: 1px solid #2a3340;
-            border-radius: 8px;
+            border: 1px solid #2a3344;
+            border-radius: 10px;
             color: #e8edf5;
-            font-size: 14px;
-            transition: all 0.2s;
+            font-size: 1rem;
+            transition: border 0.2s;
         }
-
         .login-box input:focus {
             outline: none;
             border-color: #2d6bff;
             background: #1e2632;
         }
 
-        .login-box .btn {
+        .login-box .btn-primary {
             width: 100%;
-            padding: 12px;
+            padding: 0.85rem;
             background: #2d6bff;
             border: none;
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 14px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 0.3px;
+            transition: background 0.2s, transform 0.1s;
         }
-
-        .login-box .btn:hover {
-            background: #3b78ff;
-            transform: translateY(-2px);
-        }
-
-        .login-box .btn:disabled {
+        .login-box .btn-primary:hover { background: #3b78ff; }
+        .login-box .btn-primary:active { transform: scale(0.97); }
+        .login-box .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
 
-        .login-box .error {
-            color: #dc3545;
-            font-size: 13px;
-            margin-top: 10px;
+        .login-box .status-msg {
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
             display: none;
+            padding: 0.5rem;
+            border-radius: 8px;
         }
-
-        .login-box .error.show {
+        .login-box .status-msg.error {
             display: block;
+            color: #ff4757;
+            background: rgba(255, 71, 87, 0.08);
+            border: 1px solid rgba(255, 71, 87, 0.15);
         }
-
-        .login-box .success {
-            color: #28a745;
-            font-size: 13px;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .login-box .success.show {
+        .login-box .status-msg.success {
             display: block;
+            color: #2ed573;
+            background: rgba(46, 213, 115, 0.08);
+            border: 1px solid rgba(46, 213, 115, 0.15);
+        }
+        .login-box .status-msg.construction {
+            display: block;
+            color: #ffa502;
+            background: rgba(255, 165, 2, 0.08);
+            border: 1px solid rgba(255, 165, 2, 0.15);
         }
 
         .login-box .footer {
-            margin-top: 24px;
-            text-align: center;
-            color: #3a4555;
-            font-size: 11px;
-            border-top: 1px solid #1a222e;
-            padding-top: 16px;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #1e2632;
+            color: #5a6a7a;
+            font-size: 0.7rem;
         }
+        .login-box .footer span { color: #2ed573; font-weight: 600; }
 
-        .login-box .footer .safe-hub {
-            color: #28a745;
-            font-weight: 600;
-        }
-
+        /* --- DASHBOARD --- */
         .dashboard {
             display: none;
+            flex-direction: column;
+            min-height: 100vh;
             width: 100%;
         }
+        .dashboard.active { display: flex; }
 
-        .dashboard.active {
+        /* --- TOP BAR (Mobile Friendly) --- */
+        .topbar {
             display: flex;
-        }
-
-        .sidebar {
-            width: 180px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
             background: #0f131a;
-            border-right: 1px solid #1a222e;
-            padding: 16px 12px;
-            height: 100vh;
+            border-bottom: 1px solid #1a222e;
             position: sticky;
             top: 0;
-            overflow-y: auto;
-            flex-shrink: 0;
+            z-index: 50;
         }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .topbar-brand h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .topbar-brand h2 span { color: #ff465a; }
+        .topbar-brand .badge-top {
+            font-size: 0.55rem;
+            background: rgba(255, 70, 90, 0.15);
+            color: #ff465a;
+            padding: 0.15rem 0.6rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 70, 90, 0.15);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .topbar-actions .btn-icon {
+            background: none;
+            border: none;
+            color: #8899bb;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        .topbar-actions .btn-icon:hover { background: #1a222e; }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .hamburger:hover { background: #1a222e; }
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #c0d0e0;
+            border-radius: 2px;
+            transition: 0.2s;
+        }
+        .hamburger span:nth-child(2) { width: 16px; }
+        .hamburger span:nth-child(3) { width: 20px; }
+
+        /* --- SIDEBAR (Mobile Drawer) --- */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.open { display: block; }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #0f131a;
+            border-right: 1px solid #1a222e;
+            padding: 1.5rem 1rem;
+            z-index: 101;
+            transition: left 0.25s ease;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.open { left: 0; }
 
         .sidebar-brand {
-            padding: 4px 6px;
-            margin-bottom: 20px;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #1a222e;
+            margin-bottom: 1.5rem;
         }
-
-        .sidebar-brand h2 {
-            color: #e8edf5;
-            font-size: 16px;
+        .sidebar-brand h3 {
+            font-size: 1.3rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
         }
-
-        .sidebar-brand h2 span {
-            color: #ff465a;
-        }
-
+        .sidebar-brand h3 span { color: #ff465a; }
         .sidebar-brand .sub {
             color: #5a6a7a;
-            font-size: 9px;
-            margin-top: 2px;
-        }
-
-        .sidebar-brand .badge-side {
-            display: inline-block;
-            background: rgba(255, 70, 90, 0.12);
-            color: #ff465a;
-            font-size: 8px;
-            font-weight: 600;
-            padding: 1px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 70, 90, 0.15);
-            margin-top: 4px;
+            font-size: 0.7rem;
+            margin-top: 0.1rem;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 10px;
-            border-radius: 6px;
-            color: #7a879a;
+            gap: 0.75rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            color: #8899bb;
             cursor: pointer;
             transition: all 0.2s;
-            margin-bottom: 2px;
-            font-size: 12px;
+            font-size: 0.95rem;
             font-weight: 500;
+            margin-bottom: 0.2rem;
+            text-decoration: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
         }
-
-        .nav-item:hover {
-            background: #1a222e;
-            color: #e8edf5;
-        }
-
+        .nav-item:hover { background: #1a222e; color: #e8edf5; }
         .nav-item.active {
             background: #1a222e;
             color: #e8edf5;
             border-left: 3px solid #2d6bff;
         }
-
-        .nav-item .icon {
-            width: 16px;
-            text-align: center;
-            font-size: 14px;
-        }
-
         .nav-item .count {
             margin-left: auto;
             background: #1a222e;
-            padding: 0px 6px;
-            border-radius: 10px;
-            font-size: 9px;
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
             color: #5a6a7a;
         }
-
-        .nav-item.active .count {
-            background: #2d6bff;
-            color: #ffffff;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background: #1a222e;
-            margin: 8px 6px;
-        }
+        .nav-item.active .count { background: #2d6bff; color: #fff; }
 
         .sidebar-footer {
-            margin-top: 16px;
-            padding: 8px;
+            margin-top: auto;
+            padding-top: 1rem;
             border-top: 1px solid #1a222e;
+            font-size: 0.65rem;
             color: #3a4555;
-            font-size: 9px;
             text-align: center;
         }
-
-        .sidebar-footer .key-expiry {
-            color: #ffc107;
-            font-size: 8px;
-            margin-top: 3px;
+        .sidebar-footer .status {
+            color: #2ed573;
+            font-weight: 500;
         }
 
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
-            padding: 16px 20px;
-            overflow-y: auto;
-            min-width: 0;
-            max-height: 100vh;
-        }
-
-        .main-content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .main-content::-webkit-scrollbar-track {
-            background: #0b0e14;
-        }
-
-        .main-content::-webkit-scrollbar-thumb {
-            background: #2a3340;
-            border-radius: 4px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .header-left h1 {
-            color: #e8edf5;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .header-left p {
-            color: #7a879a;
-            font-size: 12px;
-            margin-top: 1px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .stats-badge {
-            background: #141a22;
-            padding: 4px 12px;
-            border-radius: 6px;
-            border: 1px solid #212a34;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .stats-badge .stat {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            color: #a0b0c8;
-            font-size: 11px;
-        }
-
-        .stats-badge .stat .number {
-            color: #e8edf5;
-            font-weight: 600;
-        }
-
-        .btn {
-            background: #2a3340;
-            color: #e8edf5;
-            border: 1px solid #3a4555;
-            padding: 4px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .btn:hover {
-            background: #354052;
-            border-color: #4a5a6a;
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background: #2d6bff;
-            border-color: #2d6bff;
-        }
-
-        .btn-primary:hover {
-            background: #3b78ff;
-            border-color: #3b78ff;
-        }
-
-        .btn-success {
-            background: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-success:hover {
-            background: #34b854;
-            border-color: #34b854;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background: #e74c5e;
-            border-color: #e74c5e;
-        }
-
-        .btn-warning {
-            background: #ffc107;
-            border-color: #ffc107;
-            color: #0b0e14;
-        }
-
-        .btn-warning:hover {
-            background: #ffcd2e;
-            border-color: #ffcd2e;
-        }
-
-        .last-update {
-            color: #5a6a7a;
-            font-size: 10px;
-            margin-top: 1px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 16px;
-            align-items: start;
-            max-width: 1100px;
+            padding: 1rem 1.25rem;
+            max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
         }
 
-        .servers-section {
-            min-width: 0;
-        }
-
-        .commands-section {
-            min-width: 0;
-        }
-
-        .section-title {
-            color: #e8edf5;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
+        /* --- HEADER STATS --- */
+        .stats-row {
             display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.5rem;
+            background: #141a22;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid #1a222e;
+            margin-bottom: 1.5rem;
             align-items: center;
             justify-content: space-between;
         }
+        .stats-group {
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            color: #8899bb;
+        }
+        .stat-item .num {
+            color: #e8edf5;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .stats-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-sm {
+            padding: 0.35rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid #2a3344;
+            background: #1a222e;
+            color: #c0d0e0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-sm:hover { background: #2a3344; }
+        .btn-sm.primary { background: #2d6bff; border-color: #2d6bff; color: #fff; }
+        .btn-sm.primary:hover { background: #3b78ff; }
+        .btn-sm.danger { background: #ff4757; border-color: #ff4757; color: #fff; }
+        .btn-sm.danger:hover { background: #ff5a6a; }
 
-        .section-title .count {
-            color: #7a879a;
-            font-size: 11px;
-            font-weight: 400;
+        .last-update {
+            font-size: 0.7rem;
+            color: #5a6a7a;
+            margin-top: 0.2rem;
         }
 
+        /* --- PAGES --- */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-title .count {
+            color: #8899bb;
+            font-weight: 400;
+            font-size: 0.8rem;
+        }
+
+        /* --- SERVER CARDS --- */
         .grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 0.75rem;
         }
 
         .server-card {
             background: #141a22;
-            border-radius: 8px;
-            padding: 12px 14px;
-            border: 1px solid #212a34;
-            transition: all 0.25s ease;
-            max-width: 100%;
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
+            border: 1px solid #1e2632;
+            transition: all 0.2s;
         }
-
-        .server-card:hover {
-            border-color: #3a4a5a;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        }
-
-        .server-card.online {
-            border-left: 3px solid #28a745;
-        }
-
-        .server-card.offline {
-            border-left: 3px solid #dc3545;
-            opacity: 0.5;
-        }
-
-        .server-card.shutting-down {
-            border-left: 3px solid #ffc107;
-            opacity: 0.7;
-        }
+        .server-card:hover { border-color: #2a3344; }
+        .server-card.online { border-left: 3px solid #2ed573; }
+        .server-card.offline { border-left: 3px solid #ff4757; opacity: 0.6; }
+        .server-card.shutting-down { border-left: 3px solid #ffa502; opacity: 0.7; }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 4px;
+            flex-wrap: wrap;
+            gap: 0.3rem;
         }
-
         .game-name {
-            color: #e8edf5;
-            font-size: 14px;
+            font-size: 1rem;
             font-weight: 600;
         }
-
-        .game-name .infected-tag {
-            color: #ff465a;
-            font-size: 9px;
+        .game-name .tag {
+            font-size: 0.6rem;
             font-weight: 500;
-            margin-left: 4px;
+            color: #ff465a;
             background: rgba(255, 70, 90, 0.1);
-            padding: 1px 8px;
+            padding: 0.1rem 0.6rem;
             border-radius: 10px;
             border: 1px solid rgba(255, 70, 90, 0.15);
+            margin-left: 0.3rem;
         }
-
         .server-name {
-            color: #7a879a;
-            font-size: 11px;
-            font-weight: 400;
-            margin-bottom: 6px;
+            font-size: 0.75rem;
+            color: #8899bb;
+            margin-bottom: 0.5rem;
         }
 
-        .status-indicator {
+        .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            font-size: 9px;
+            gap: 0.3rem;
+            font-size: 0.6rem;
             font-weight: 600;
             text-transform: uppercase;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
             letter-spacing: 0.3px;
-            padding: 2px 8px;
-            border-radius: 10px;
         }
-
-        .status-indicator.online {
-            color: #28a745;
-            background: rgba(40, 167, 69, 0.08);
-            border: 1px solid rgba(40, 167, 69, 0.15);
+        .status-badge.online {
+            color: #2ed573;
+            background: rgba(46, 213, 115, 0.08);
+            border: 1px solid rgba(46, 213, 115, 0.15);
         }
-
-        .status-indicator.offline {
-            color: #dc3545;
-            background: rgba(220, 53, 69, 0.08);
-            border: 1px solid rgba(220, 53, 69, 0.15);
+        .status-badge.offline {
+            color: #ff4757;
+            background: rgba(255, 71, 87, 0.08);
+            border: 1px solid rgba(255, 71, 87, 0.15);
         }
-
-        .status-indicator.shutting-down {
-            color: #ffc107;
-            background: rgba(255, 193, 7, 0.08);
-            border: 1px solid rgba(255, 193, 7, 0.15);
+        .status-badge.shutting-down {
+            color: #ffa502;
+            background: rgba(255, 165, 2, 0.08);
+            border: 1px solid rgba(255, 165, 2, 0.15);
         }
-
         .status-dot {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             display: inline-block;
         }
-
-        .status-dot.online {
-            background: #28a745;
-            animation: pulse-dot 2s infinite;
-        }
-
-        .status-dot.offline {
-            background: #dc3545;
-        }
-
-        .status-dot.shutting-down {
-            background: #ffc107;
-            animation: pulse-dot 1s infinite;
-        }
+        .status-dot.online { background: #2ed573; animation: pulse-dot 2s infinite; }
+        .status-dot.offline { background: #ff4757; }
+        .status-dot.shutting-down { background: #ffa502; animation: pulse-dot 1s infinite; }
 
         @keyframes pulse-dot {
             0%, 100% { opacity: 1; }
@@ -585,147 +504,110 @@
         .details-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            margin: 6px 0 0 0;
-            padding: 6px 0 0 0;
-            border-top: 1px solid #1e2632;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid #1a222e;
         }
-
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
-
         .detail-item .label {
-            color: #5a6a7a;
-            font-size: 8px;
+            font-size: 0.55rem;
             text-transform: uppercase;
+            color: #5a6a7a;
             letter-spacing: 0.3px;
             font-weight: 600;
         }
-
         .detail-item .value {
-            color: #e8edf5;
-            font-size: 11px;
+            font-size: 0.8rem;
             font-weight: 500;
+            color: #e8edf5;
         }
-
-        .detail-item .value .sub {
-            color: #7a879a;
-            font-weight: 400;
-            font-size: 10px;
-        }
+        .detail-item .value .sub { color: #8899bb; font-weight: 400; font-size: 0.7rem; }
 
         .player-list {
-            margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px solid #1e2632;
+            margin-top: 0.6rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid #1a222e;
         }
-
         .player-list .title {
-            color: #5a6a7a;
-            font-size: 9px;
+            font-size: 0.6rem;
             text-transform: uppercase;
+            color: #5a6a7a;
             letter-spacing: 0.3px;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 0.3rem;
         }
-
         .player-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 0.3rem;
         }
-
         .player-tag {
             background: #1a222e;
             color: #b0c0d8;
-            padding: 1px 8px;
-            border-radius: 12px;
-            font-size: 10px;
+            padding: 0.1rem 0.7rem;
+            border-radius: 14px;
+            font-size: 0.7rem;
             border: 1px solid #26303e;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
         }
-
-        .player-tag:hover {
-            background: #26303e;
-            border-color: #3a4a5a;
-        }
-
-        .player-tag.selected {
-            background: #2d6bff;
-            border-color: #2d6bff;
-            color: #ffffff;
-        }
+        .player-tag:hover { background: #26303e; border-color: #3a4a5a; }
+        .player-tag.selected { background: #2d6bff; border-color: #2d6bff; color: #fff; }
 
         .card-actions {
             display: flex;
-            gap: 4px;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #1e2632;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid #1a222e;
             flex-wrap: wrap;
         }
+        .card-actions .btn-sm { flex: 1; text-align: center; min-width: 60px; }
 
-        .card-actions .btn {
-            flex: 1;
-            text-align: center;
-            padding: 3px 8px;
-            font-size: 9px;
-            min-width: 50px;
-        }
-
+        /* --- COMMANDS PANEL --- */
         .commands-panel {
             background: #141a22;
-            border-radius: 8px;
-            padding: 14px 16px;
-            border: 1px solid #212a34;
+            border-radius: 12px;
+            padding: 1.2rem 1.2rem;
+            border: 1px solid #1e2632;
             position: sticky;
-            top: 16px;
+            top: 80px;
         }
-
         .commands-panel .panel-title {
-            color: #e8edf5;
-            font-size: 14px;
+            font-size: 1.05rem;
             font-weight: 600;
-            margin-bottom: 2px;
+            margin-bottom: 0.1rem;
         }
-
         .commands-panel .panel-subtitle {
-            color: #7a879a;
-            font-size: 11px;
-            margin-bottom: 12px;
+            color: #8899bb;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
         }
 
         .form-group {
-            margin-bottom: 8px;
+            margin-bottom: 0.7rem;
         }
-
         .form-group label {
             display: block;
-            color: #a0b0c8;
-            font-size: 9px;
-            font-weight: 500;
-            margin-bottom: 2px;
+            color: #8899bb;
+            font-size: 0.65rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.3px;
+            margin-bottom: 0.2rem;
         }
-
         .form-group select,
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 5px 8px;
+            padding: 0.5rem 0.7rem;
             background: #1a222e;
-            border: 1px solid #2a3340;
-            border-radius: 4px;
+            border: 1px solid #2a3344;
+            border-radius: 8px;
             color: #e8edf5;
-            font-size: 11px;
-            transition: all 0.2s;
+            font-size: 0.85rem;
+            transition: border 0.2s;
         }
-
         .form-group select:focus,
         .form-group input:focus,
         .form-group textarea:focus {
@@ -733,384 +615,197 @@
             border-color: #2d6bff;
             background: #1e2632;
         }
-
-        .form-group select option {
-            background: #141a22;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 36px;
-            font-family: inherit;
-        }
+        .form-group select option { background: #141a22; }
 
         .command-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            margin-top: 10px;
+            gap: 0.4rem;
+            margin-top: 0.8rem;
         }
+        .command-buttons .btn-sm { padding: 0.5rem; font-size: 0.7rem; text-transform: uppercase; }
+        .command-buttons .full { grid-column: 1 / -1; }
 
-        .command-buttons .btn {
-            padding: 4px 8px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-        }
-
-        .command-buttons .btn-full {
-            grid-column: 1 / -1;
-        }
-
+        /* --- EMPTY STATE --- */
         .empty-state {
             text-align: center;
-            padding: 24px 16px;
+            padding: 2rem 1rem;
             color: #5a6a7a;
         }
+        .empty-state .icon { font-size: 2rem; opacity: 0.3; margin-bottom: 0.5rem; }
+        .empty-state h3 { color: #8899bb; font-weight: 500; font-size: 0.95rem; }
+        .empty-state p { font-size: 0.8rem; }
 
-        .empty-state .icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-            opacity: 0.3;
-        }
-
-        .empty-state h3 {
-            color: #8a9aaa;
-            font-weight: 500;
-            font-size: 13px;
-        }
-
-        .empty-state p {
-            font-size: 11px;
-            margin-top: 2px;
-        }
-
-        .footer {
-            margin-top: 16px;
-            text-align: center;
-            color: #3a4555;
-            font-size: 10px;
-            border-top: 1px solid #1a222e;
-            padding-top: 12px;
-        }
-
-        .footer .safe-hub {
-            color: #28a745;
-            font-weight: 600;
-        }
-
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 200;
+            backdrop-filter: blur(4px);
         }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
+        .modal-overlay.active { display: flex; }
         .modal {
             background: #141a22;
-            padding: 32px 40px;
-            border-radius: 12px;
-            border: 1px solid #2a3340;
-            max-width: 400px;
+            padding: 2rem 2rem;
+            border-radius: 1.2rem;
+            border: 1px solid #2a3344;
+            max-width: 380px;
             width: 90%;
             text-align: center;
         }
+        .modal h2 { color: #ffa502; font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .modal p { color: #a0b0c8; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.2rem; }
 
-        .modal h2 {
-            color: #ff465a;
-            font-size: 20px;
-            margin-bottom: 10px;
+        /* --- FOOTER --- */
+        .footer-bar {
+            text-align: center;
+            color: #3a4555;
+            font-size: 0.65rem;
+            padding: 1rem;
+            border-top: 1px solid #1a222e;
+            margin-top: 1.5rem;
         }
 
-        .modal p {
-            color: #a0b0c8;
-            font-size: 13px;
-            line-height: 1.6;
-            margin-bottom: 16px;
-        }
-
-        .modal .btn {
-            padding: 8px 24px;
-            font-size: 13px;
-        }
-
-        @media (max-width: 1100px) {
+        /* --- RESPONSIVE --- */
+        @media (min-width: 768px) {
+            .topbar { padding: 0.75rem 2rem; }
+            .main-content { padding: 1.5rem 2rem; }
+            .sidebar { left: 0; width: 200px; position: sticky; top: 0; height: 100vh; border-right: 1px solid #1a222e; background: #0f131a; }
+            .sidebar-overlay { display: none !important; }
+            .dashboard { flex-direction: row; }
+            .hamburger { display: none; }
+            .stats-row { padding: 0.75rem 1.5rem; }
+            .details-grid { grid-template-columns: repeat(3, 1fr); }
             .main-grid {
-                grid-template-columns: 1fr 280px;
-                gap: 12px;
-            }
-            .sidebar {
-                width: 160px;
-                padding: 12px 10px;
-            }
-            .main-content {
-                padding: 12px 16px;
+                display: grid;
+                grid-template-columns: 1fr 320px;
+                gap: 1.5rem;
+                align-items: start;
             }
         }
 
-        @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-                max-width: 100%;
-            }
-            .commands-panel {
-                position: static;
-            }
+        @media (max-width: 767px) {
+            .topbar { padding: 0.6rem 1rem; }
+            .main-content { padding: 0.8rem 1rem; }
+            .stats-row { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+            .stats-group { justify-content: space-between; }
+            .stats-actions { justify-content: flex-end; }
+            .details-grid { grid-template-columns: 1fr 1fr; }
+            .main-grid { display: block; }
+            .commands-panel { position: static; margin-top: 1rem; }
+            .login-box { padding: 2rem 1.5rem; }
+            .card-actions .btn-sm { flex: 1 1 40%; }
+            .command-buttons { grid-template-columns: 1fr; }
         }
 
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: static;
-                border-right: none;
-                border-bottom: 1px solid #1a222e;
-                padding: 8px 12px;
-            }
-            .sidebar-brand {
-                margin-bottom: 8px;
-            }
-            .nav-items {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2px;
-            }
-            .nav-item {
-                padding: 4px 10px;
-                flex: 1;
-                min-width: 60px;
-                justify-content: center;
-                font-size: 10px;
-            }
-            .nav-item .count {
-                display: none;
-            }
-            .nav-divider {
-                display: none;
-            }
-            .sidebar-footer {
-                display: none;
-            }
-            .main-content {
-                padding: 10px;
-                max-height: none;
-            }
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .header-right {
-                width: 100%;
-            }
-            .stats-badge {
-                flex-wrap: wrap;
-                width: 100%;
-                justify-content: space-between;
-            }
-            .details-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .command-buttons {
-                grid-template-columns: 1fr;
-            }
-            .card-actions {
-                flex-wrap: wrap;
-            }
-            .card-actions .btn {
-                flex: 1 1 40%;
-                min-width: 50px;
-            }
-            .login-box {
-                padding: 32px 24px;
-            }
-            .login-box h1 {
-                font-size: 24px;
-            }
-            .main-grid {
-                max-width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sidebar-brand h2 {
-                font-size: 14px;
-            }
-            .main-content {
-                padding: 8px;
-            }
-            .header-left h1 {
-                font-size: 16px;
-            }
-            .stats-badge {
-                gap: 6px;
-                padding: 4px 8px;
-            }
-            .stats-badge .stat {
-                font-size: 9px;
-            }
-            .server-card {
-                padding: 8px 10px;
-            }
-            .game-name {
-                font-size: 12px;
-            }
-            .details-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 3px;
-            }
-            .detail-item .value {
-                font-size: 10px;
-            }
-            .commands-panel {
-                padding: 10px 12px;
-            }
-            .form-group select,
-            .form-group input {
-                padding: 4px 6px;
-                font-size: 10px;
-            }
-            .command-buttons .btn {
-                font-size: 9px;
-                padding: 4px 6px;
-            }
-            .login-box {
-                padding: 20px 16px;
-            }
-            .login-box h1 {
-                font-size: 20px;
-            }
-            .main-grid {
-                max-width: 100%;
-            }
-        }
-
-        @media (min-width: 1101px) {
-            .main-grid {
-                max-width: 1100px;
-                margin: 0 auto;
-            }
-            .server-card {
-                max-width: 100%;
-            }
-            .details-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .card-actions .btn {
-                padding: 3px 8px;
-                font-size: 9px;
-                min-width: 60px;
-            }
+        @media (max-width: 420px) {
+            .topbar-brand h2 { font-size: 1rem; }
+            .stats-group { gap: 0.6rem; }
+            .stat-item { font-size: 0.7rem; }
+            .stat-item .num { font-size: 0.85rem; }
+            .details-grid { grid-template-columns: 1fr 1fr; gap: 0.2rem; }
+            .detail-item .value { font-size: 0.7rem; }
+            .server-card { padding: 0.7rem 0.8rem; }
+            .game-name { font-size: 0.85rem; }
         }
     </style>
 </head>
 <body>
-    <!-- ========== LOGIN PAGE ========== -->
+    <!-- ====== LOGIN ====== -->
     <div class="login-container" id="loginContainer">
         <div class="login-box">
             <h1>Safe<span>Hub</span></h1>
             <div class="subtitle">Infected Games Network</div>
-            <div class="badge">Private Access Only</div>
+            <div class="badge">Private Access</div>
 
-            <div id="loginStatus" class="error"></div>
+            <div id="loginStatus" class="status-msg"></div>
 
             <div class="form-group">
                 <label for="keyInput">Access Key</label>
                 <input type="password" id="keyInput" placeholder="Enter your key..." autocomplete="off">
             </div>
 
-            <button class="btn" id="loginBtn" onclick="validateKey()">Access Dashboard</button>
+            <button class="btn-primary" id="loginBtn" onclick="validateKey()">Access Dashboard</button>
 
             <div class="footer">
-                <span class="safe-hub">Safe Hub</span> &bull; Powered by Safe Hub Network
+                <span>Safe Hub</span> &bull; Protected Network
             </div>
         </div>
     </div>
 
-    <!-- ========== KEY EXPIRY MODAL ========== -->
+    <!-- ====== KEY EXPIRY MODAL ====== -->
     <div class="modal-overlay" id="keyExpiryModal">
         <div class="modal">
-            <h2>⏰ Key Expired</h2>
+            <h2>Key Expired</h2>
             <p>Your access key has expired. Please generate a new key using the Discord bot and log in again.</p>
-            <button class="btn btn-primary" onclick="logout()">Logout & Get New Key</button>
+            <button class="btn-sm primary" onclick="logout()" style="padding:0.6rem 1.5rem;">Logout &amp; Get New Key</button>
         </div>
     </div>
 
-    <!-- ========== DASHBOARD ========== -->
+    <!-- ====== DASHBOARD ====== -->
     <div class="dashboard" id="dashboard">
-        <div class="sidebar">
+        <!-- SIDEBAR OVERLAY (mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <h2>Safe<span>Hub</span></h2>
-                <div class="sub">Infected Games Network</div>
-                <div class="badge-side">Command Center</div>
+                <h3>Safe<span>Hub</span></h3>
+                <div class="sub">Command Center</div>
             </div>
 
-            <div class="nav-items">
-                <div class="nav-item active" onclick="switchPage('servers')" id="nav-servers">
-                    <span class="icon">🖥️</span>
-                    <span>Servers</span>
-                    <span class="count" id="navServerCount">0</span>
-                </div>
-                <div class="nav-item" onclick="switchPage('players')" id="nav-players">
-                    <span class="icon">👤</span>
-                    <span>Players</span>
-                    <span class="count" id="navPlayerCount">0</span>
-                </div>
-                <div class="nav-item" onclick="switchPage('commands')" id="nav-commands">
-                    <span class="icon">⚡</span>
-                    <span>Commands</span>
-                </div>
-            </div>
-
-            <div class="nav-divider"></div>
+            <button class="nav-item active" onclick="switchPage('servers')" id="nav-servers">
+                Servers
+                <span class="count" id="navServerCount">0</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('players')" id="nav-players">
+                Players
+                <span class="count" id="navPlayerCount">0</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('commands')" id="nav-commands">
+                Commands
+            </button>
 
             <div class="sidebar-footer">
-                <div>Connection</div>
-                <div style="margin-top:2px; color: #28a745;" id="connectionStatus">● Polling (5s)</div>
-                <div class="key-expiry" id="keyExpiryDisplay">Key expires in: --</div>
+                <div>Connection: <span class="status">Polling (5s)</span></div>
+                <div id="keyExpiryDisplay" style="color:#ffa502;font-size:0.6rem;margin-top:0.2rem;">Key expires in: --</div>
             </div>
         </div>
 
+        <!-- MAIN CONTENT -->
         <div class="main-content">
-            <div class="header">
-                <div class="header-left">
-                    <h1 id="pageTitle">Servers</h1>
-                    <p id="pageSubtitle">Monitor all infected game servers in the network</p>
-                    <div class="last-update" id="lastUpdate">Last updated: —</div>
-                </div>
-                <div class="header-right">
-                    <div class="stats-badge">
-                        <div class="stat">
-                            <span>Servers</span>
-                            <span class="number" id="serverCount">0</span>
-                        </div>
-                        <div class="stat">
-                            <span>Online</span>
-                            <span class="number" id="onlineCount">0</span>
-                        </div>
-                        <div class="stat">
-                            <span>Players</span>
-                            <span class="number" id="playerCount">0</span>
-                        </div>
+            <!-- TOP BAR -->
+            <div class="topbar">
+                <div class="topbar-brand">
+                    <div class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+                        <span></span><span></span><span></span>
                     </div>
-                    <button class="btn btn-primary" onclick="refreshData()">⟳ Refresh</button>
-                    <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+                    <h2>Safe<span>Hub</span></h2>
+                    <span class="badge-top">Command Center</span>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn-icon" onclick="refreshData()" title="Refresh">⟳</button>
+                    <button class="btn-icon" onclick="logout()" title="Logout" style="color:#ff4757;">⏻</button>
                 </div>
             </div>
 
-            <!-- Servers Page -->
+            <!-- STATS ROW -->
+            <div class="stats-row">
+                <div class="stats-group">
+                    <div class="stat-item">Servers <span class="num" id="serverCount">0</span></div>
+                    <div class="stat-item">Online <span class="num" id="onlineCount">0</span></div>
+                    <div class="stat-item">Players <span class="num" id="playerCount">0</span></div>
+                </div>
+                <div class="stats-actions">
+                    <span class="last-update" id="lastUpdate">Updated: —</span>
+                </div>
+            </div>
+
+            <!-- PAGES -->
             <div class="page active" id="page-servers">
                 <div class="section-title">
                     <span>Active Servers</span>
@@ -1125,7 +820,6 @@
                 </div>
             </div>
 
-            <!-- Players Page -->
             <div class="page" id="page-players">
                 <div class="section-title">
                     <span>Players Online</span>
@@ -1140,10 +834,9 @@
                 </div>
             </div>
 
-            <!-- Commands Page -->
             <div class="page" id="page-commands">
                 <div class="commands-panel">
-                    <div class="panel-title">⚡ Command Center</div>
+                    <div class="panel-title">Command Center</div>
                     <div class="panel-subtitle">Execute commands on selected server and player</div>
 
                     <div class="form-group">
@@ -1157,7 +850,7 @@
                         <label for="playerSelect">Target Player</label>
                         <select id="playerSelect">
                             <option value="">Select a player...</option>
-                            <option value="ALL">👥 ALL PLAYERS</option>
+                            <option value="ALL">ALL PLAYERS</option>
                         </select>
                     </div>
 
@@ -1184,7 +877,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group" id="extraInputGroup">
+                    <div class="form-group">
                         <label for="extraInput">Additional Parameters</label>
                         <input type="text" id="extraInput" placeholder="Duration, message, rank, coordinates...">
                     </div>
@@ -1195,51 +888,66 @@
                     </div>
 
                     <div class="command-buttons">
-                        <button class="btn btn-danger btn-full" onclick="executeCommand()">
-                            ⚡ Execute Command
-                        </button>
-                        <button class="btn btn-warning" onclick="clearSelection()">
-                            Clear Selection
-                        </button>
-                        <button class="btn btn-success" onclick="refreshPlayers()">
-                            Refresh Players
-                        </button>
+                        <button class="btn-sm danger full" onclick="executeCommand()">Execute Command</button>
+                        <button class="btn-sm" onclick="clearSelection()">Clear Selection</button>
+                        <button class="btn-sm primary" onclick="refreshPlayers()">Refresh Players</button>
                     </div>
                 </div>
             </div>
 
-            <div class="footer">
-                <p><span class="safe-hub">Safe Hub</span> &bull; Infected Games Command Center &bull; Updates every 5 seconds</p>
+            <div class="footer-bar">
+                <span>Safe Hub</span> &bull; Command Center &bull; Real-time updates
             </div>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // ==================== SAFE HUB DASHBOARD ====================
+        // CONFIGURATION
         // ============================================================
+        const API_URL = 'https://safehub-backend-production.up.railway.app';
+        const KEY_EXPIRY_HOURS = 24;
 
+        // ============================================================
+        // MAINTENANCE MODE — SET TO false FOR NORMAL OPERATION
+        // ============================================================
+        const MAINTENANCE_MODE = false;  // ← CHANGE TO true TO LOCK EVERYONE OUT
+
+        // ============================================================
+        // STATE
+        // ============================================================
         let serverData = { servers: [] };
         let selectedServerId = null;
         let selectedPlayer = null;
         let currentPage = 'servers';
         let validated = false;
 
-        const API_URL = 'https://safehub-backend-production.up.railway.app';
-        const KEY_EXPIRY_HOURS = 24;
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const $ = (id) => document.getElementById(id);
 
-        // ==================== KEY VALIDATION ====================
+        // ============================================================
+        // KEY VALIDATION
+        // ============================================================
         async function validateKey() {
-            const keyInput = document.getElementById('keyInput');
-            const loginBtn = document.getElementById('loginBtn');
-            const statusEl = document.getElementById('loginStatus');
+            const keyInput = $('keyInput');
+            const loginBtn = $('loginBtn');
+            const statusEl = $('loginStatus');
             const key = keyInput.value.trim();
 
-            statusEl.classList.remove('show', 'error', 'success');
+            statusEl.className = 'status-msg';
+
+            // --- MAINTENANCE MODE CHECK ---
+            if (MAINTENANCE_MODE === true) {
+                statusEl.textContent = 'Please try again later, the website is under construction. Contact dime for info.';
+                statusEl.className = 'status-msg construction';
+                return;
+            }
 
             if (!key) {
                 statusEl.textContent = 'Please enter your access key.';
-                statusEl.className = 'error show';
+                statusEl.className = 'status-msg error';
                 return;
             }
 
@@ -1247,27 +955,20 @@
             loginBtn.textContent = 'Validating...';
 
             try {
-                // Fetch all keys from the backend
                 const response = await fetch(`${API_URL}/api/keys`);
-
-                if (!response.ok) {
-                    throw new Error(`Server responded with status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
 
                 const data = await response.json();
-
-                // Check if the entered key exists in the keys array
                 const keys = data.keys || [];
                 const foundKey = keys.find(k => k.key === key);
 
                 if (foundKey) {
-                    // Check if key is active and not expired
                     const expiry = new Date(foundKey.expires_at);
                     const now = new Date();
 
                     if (!foundKey.active) {
                         statusEl.textContent = 'Key has been revoked.';
-                        statusEl.className = 'error show';
+                        statusEl.className = 'status-msg error';
                         loginBtn.disabled = false;
                         loginBtn.textContent = 'Access Dashboard';
                         return;
@@ -1275,15 +976,15 @@
 
                     if (expiry < now) {
                         statusEl.textContent = 'Key has expired. Please generate a new one.';
-                        statusEl.className = 'error show';
+                        statusEl.className = 'status-msg error';
                         loginBtn.disabled = false;
                         loginBtn.textContent = 'Access Dashboard';
                         return;
                     }
 
-                    // Key is valid!
-                    statusEl.textContent = '✅ Key validated successfully! Loading dashboard...';
-                    statusEl.className = 'success show';
+                    // VALID
+                    statusEl.textContent = 'Key validated successfully! Loading dashboard...';
+                    statusEl.className = 'status-msg success';
                     validated = true;
 
                     localStorage.setItem('safehub_key', key);
@@ -1293,37 +994,35 @@
                     localStorage.setItem('safehub_key_expiry', keyExpiry.toISOString());
 
                     setTimeout(() => {
-                        document.getElementById('loginContainer').style.display = 'none';
-                        document.getElementById('dashboard').classList.add('active');
+                        $('loginContainer').style.display = 'none';
+                        $('dashboard').classList.add('active');
                         initializeDashboard();
-                    }, 1000);
+                    }, 800);
                 } else {
                     statusEl.textContent = 'Invalid key. Please check and try again.';
-                    statusEl.className = 'error show';
+                    statusEl.className = 'status-msg error';
                     loginBtn.disabled = false;
                     loginBtn.textContent = 'Access Dashboard';
                 }
             } catch (error) {
                 console.error('Validation error:', error);
-                statusEl.textContent = 'Network error: ' + error.message + '. Make sure the backend is running.';
-                statusEl.className = 'error show';
+                statusEl.textContent = 'Network error: ' + error.message;
+                statusEl.className = 'status-msg error';
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Access Dashboard';
             }
         }
 
-        document.getElementById('keyInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                validateKey();
-            }
+        $('keyInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') validateKey();
         });
 
-        // ==================== KEY EXPIRY ====================
+        // ============================================================
+        // KEY EXPIRY
+        // ============================================================
         function getKeyExpiry() {
             const stored = localStorage.getItem('safehub_key_expiry');
-            if (stored) {
-                return new Date(stored);
-            }
+            if (stored) return new Date(stored);
             const expiry = new Date();
             expiry.setHours(expiry.getHours() + KEY_EXPIRY_HOURS);
             localStorage.setItem('safehub_key_expiry', expiry.toISOString());
@@ -1333,17 +1032,14 @@
         function checkKeyExpiry() {
             const expiry = getKeyExpiry();
             const now = new Date();
-
             if (now > expiry) {
-                document.getElementById('keyExpiryModal').classList.add('active');
+                $('keyExpiryModal').classList.add('active');
                 return false;
             }
-
             const diff = expiry - now;
             const hours = Math.floor(diff / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            document.getElementById('keyExpiryDisplay').textContent = `Key expires in: ${hours}h ${minutes}m`;
-
+            $('keyExpiryDisplay').textContent = `Key expires in: ${hours}h ${minutes}m`;
             setTimeout(checkKeyExpiry, 60000);
             return true;
         }
@@ -1355,64 +1051,59 @@
             window.location.reload();
         }
 
-        // ==================== FETCH SERVERS ====================
+        // ============================================================
+        // SIDEBAR (mobile)
+        // ============================================================
+        function toggleSidebar() {
+            const sidebar = $('sidebar');
+            const overlay = $('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        // Close sidebar on nav click (mobile)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    $('sidebar').classList.remove('open');
+                    $('sidebarOverlay').classList.remove('open');
+                }
+            });
+        });
+
+        // ============================================================
+        // FETCH SERVERS
+        // ============================================================
         async function fetchServers() {
             try {
-                console.log('[Safe Hub] Fetching servers from:', API_URL);
                 const response = await fetch(`${API_URL}/api/servers`);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
-                console.log('[Safe Hub] Server data received:', data);
-
-                if (data.servers) {
-                    serverData = data;
-                } else if (Array.isArray(data)) {
-                    serverData = { servers: data };
-                } else {
-                    serverData = { servers: [] };
-                }
+                serverData = data.servers ? data : { servers: Array.isArray(data) ? data : [] };
 
                 renderServers(serverData.servers);
                 renderPlayers(serverData.servers);
                 updateServerSelect(serverData.servers);
                 updateStats(serverData.servers);
-                document.getElementById('lastUpdate').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
-
-                const grid = document.getElementById('serverGrid');
-                if (grid.querySelector('.empty-state')?.querySelector('.icon')?.textContent === '❌') {
-                    grid.innerHTML = '';
-                }
-
+                $('lastUpdate').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
             } catch (error) {
-                console.error('[Safe Hub] Error fetching servers:', error);
-                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    document.getElementById('serverGrid').innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">❌</div>
-                            <h3>Connection Error</h3>
-                            <p>Cannot reach backend at ${API_URL}</p>
-                            <p style="margin-top:10px;font-size:12px;">Check if the backend is running and accessible.</p>
-                        </div>
-                    `;
-                } else {
-                    document.getElementById('serverGrid').innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">📡</div>
-                            <h3>No Active Servers</h3>
-                            <p>Waiting for Safe Hub servers to connect</p>
-                        </div>
-                    `;
-                }
+                console.error('Fetch error:', error);
+                $('serverGrid').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <h3>Connection Error</h3>
+                        <p>Cannot reach backend at ${API_URL}</p>
+                    </div>
+                `;
             }
         }
 
-        // ==================== RENDER FUNCTIONS ====================
+        // ============================================================
+        // RENDER FUNCTIONS
+        // ============================================================
         function renderServers(servers) {
-            const grid = document.getElementById('serverGrid');
+            const grid = $('serverGrid');
             grid.innerHTML = '';
 
             if (!servers || servers.length === 0) {
@@ -1423,39 +1114,27 @@
                         <p>Waiting for Safe Hub servers to connect</p>
                     </div>
                 `;
-                document.getElementById('serverCountLabel').textContent = '0 servers';
-                document.getElementById('navServerCount').textContent = '0';
+                $('serverCountLabel').textContent = '0 servers';
+                $('navServerCount').textContent = '0';
                 return;
             }
 
-            document.getElementById('serverCountLabel').textContent = `${servers.length} servers`;
-            document.getElementById('navServerCount').textContent = servers.length;
+            $('serverCountLabel').textContent = `${servers.length} servers`;
+            $('navServerCount').textContent = servers.length;
 
             servers.forEach(server => {
+                const statusClass = server.isShuttingDown ? 'shutting-down' : server.online ? 'online' : 'offline';
+                const statusText = server.isShuttingDown ? 'Shutting Down' : server.online ? 'Online' : 'Offline';
+
                 const card = document.createElement('div');
-
-                let statusClass = 'online';
-                let statusText = 'Online';
-                let statusDot = 'online';
-
-                if (server.isShuttingDown) {
-                    statusClass = 'shutting-down';
-                    statusText = 'Shutting Down';
-                    statusDot = 'shutting-down';
-                } else if (!server.online) {
-                    statusClass = 'offline';
-                    statusText = 'Offline';
-                    statusDot = 'offline';
-                }
-
                 card.className = `server-card ${statusClass}`;
                 card.dataset.serverId = server.serverId;
 
-                const playerList = server.playerNames && server.playerNames.length > 0
+                const playerList = server.playerNames?.length
                     ? server.playerNames.map(name =>
                         `<span class="player-tag" onclick="selectPlayerFromCard('${escapeHtml(name)}', '${server.serverId}')">${escapeHtml(name)}</span>`
-                      ).join('')
-                    : '<span style="color:#5a6a7a;font-size:10px;">No players online</span>';
+                    ).join('')
+                    : '<span style="color:#5a6a7a;font-size:0.7rem;">No players online</span>';
 
                 const gamePageUrl = server.gamePageUrl || `https://www.roblox.com/games/${server.serverId || ''}`;
 
@@ -1464,13 +1143,13 @@
                         <div>
                             <div class="game-name">
                                 ${escapeHtml(server.gameName || 'Unknown Game')}
-                                <span class="infected-tag">Infected</span>
+                                <span class="tag">Infected</span>
                             </div>
                             <div class="server-name">${escapeHtml(server.serverName || 'Unnamed Server')}</div>
                         </div>
                         <div>
-                            <span class="status-indicator ${statusClass}">
-                                <span class="status-dot ${statusDot}"></span>
+                            <span class="status-badge ${statusClass}">
+                                <span class="status-dot ${statusClass}"></span>
                                 ${statusText}
                             </span>
                         </div>
@@ -1498,7 +1177,7 @@
                         </div>
                         <div class="detail-item">
                             <span class="label">Server ID</span>
-                            <span class="value" style="font-size:9px;color:#7a879a;font-weight:400;">${escapeHtml(String(server.serverId || '').substring(0, 12))}</span>
+                            <span class="value" style="font-size:0.6rem;color:#5a6a7a;">${escapeHtml(String(server.serverId || '').slice(0, 12))}</span>
                         </div>
                     </div>
                     <div class="player-list">
@@ -1506,30 +1185,25 @@
                         <div class="player-tags">${playerList}</div>
                     </div>
                     <div class="card-actions">
-                        <button class="btn btn-success" onclick="selectServer('${server.serverId}')">Select Server</button>
-                        <button class="btn btn-primary" onclick="window.open('${gamePageUrl}', '_blank')">Game Page</button>
-                        <button class="btn btn-warning" onclick="joinServer('${server.serverId}')">Join Server</button>
-                        <button class="btn btn-danger" onclick="shutdownServer('${server.serverId}')">Shutdown</button>
+                        <button class="btn-sm success" onclick="selectServer('${server.serverId}')">Select</button>
+                        <button class="btn-sm primary" onclick="window.open('${gamePageUrl}', '_blank')">Game</button>
+                        <button class="btn-sm" onclick="joinServer('${server.serverId}')">Join</button>
+                        <button class="btn-sm danger" onclick="shutdownServer('${server.serverId}')">Shutdown</button>
                     </div>
                 `;
-
                 grid.appendChild(card);
             });
         }
 
         function renderPlayers(servers) {
-            const grid = document.getElementById('playerGrid');
+            const grid = $('playerGrid');
             grid.innerHTML = '';
 
-            let allPlayers = [];
+            const allPlayers = [];
             servers.forEach(server => {
-                if (server.playerNames && server.playerNames.length > 0) {
+                if (server.playerNames?.length) {
                     server.playerNames.forEach(name => {
-                        allPlayers.push({
-                            name: name,
-                            server: server.gameName || 'Unknown',
-                            serverId: server.serverId
-                        });
+                        allPlayers.push({ name, server: server.gameName || 'Unknown', serverId: server.serverId });
                     });
                 }
             });
@@ -1542,321 +1216,206 @@
                         <p>Players will appear here when they join a server</p>
                     </div>
                 `;
-                document.getElementById('playerCountLabel').textContent = '0 players';
-                document.getElementById('navPlayerCount').textContent = '0';
+                $('playerCountLabel').textContent = '0 players';
+                $('navPlayerCount').textContent = '0';
                 return;
             }
 
-            document.getElementById('playerCountLabel').textContent = `${allPlayers.length} players`;
-            document.getElementById('navPlayerCount').textContent = allPlayers.length;
+            $('playerCountLabel').textContent = `${allPlayers.length} players`;
+            $('navPlayerCount').textContent = allPlayers.length;
 
             allPlayers.forEach(player => {
                 const card = document.createElement('div');
                 card.className = 'server-card online';
-                card.style.cursor = 'pointer';
-
                 card.innerHTML = `
                     <div class="card-header">
                         <div>
-                            <div class="game-name">
-                                ${escapeHtml(player.name)}
-                            </div>
+                            <div class="game-name">${escapeHtml(player.name)}</div>
                             <div class="server-name">${escapeHtml(player.server)}</div>
                         </div>
                         <div>
-                            <span class="status-indicator online">
+                            <span class="status-badge online">
                                 <span class="status-dot online"></span>
                                 Online
                             </span>
                         </div>
                     </div>
                     <div class="card-actions">
-                        <button class="btn btn-success" onclick="selectPlayerFromCard('${escapeHtml(player.name)}', '${player.serverId}')">Select Player</button>
-                        <button class="btn btn-primary" onclick="selectServer('${player.serverId}')">View Server</button>
+                        <button class="btn-sm success" onclick="selectPlayerFromCard('${escapeHtml(player.name)}', '${player.serverId}')">Select Player</button>
+                        <button class="btn-sm primary" onclick="selectServer('${player.serverId}')">View Server</button>
                     </div>
                 `;
-
                 grid.appendChild(card);
             });
         }
 
         function updateStats(servers) {
-            let totalPlayers = 0;
-            let onlineServers = 0;
-
-            servers.forEach(server => {
-                if (server.online && !server.isShuttingDown) {
-                    onlineServers++;
-                    totalPlayers += server.players || 0;
-                }
+            let totalPlayers = 0, onlineServers = 0;
+            servers.forEach(s => {
+                if (s.online && !s.isShuttingDown) { onlineServers++; totalPlayers += s.players || 0; }
             });
-
-            document.getElementById('serverCount').textContent = servers.length;
-            document.getElementById('onlineCount').textContent = onlineServers;
-            document.getElementById('playerCount').textContent = totalPlayers;
+            $('serverCount').textContent = servers.length;
+            $('onlineCount').textContent = onlineServers;
+            $('playerCount').textContent = totalPlayers;
         }
 
         function updateServerSelect(servers) {
-            const select = document.getElementById('serverSelect');
-            const currentValue = select.value;
-
+            const select = $('serverSelect');
+            const currentVal = select.value;
             select.innerHTML = '<option value="">Select a server...</option>';
-
-            servers.forEach(server => {
-                if (server.online && !server.isShuttingDown) {
-                    const option = document.createElement('option');
-                    option.value = server.serverId;
-                    option.textContent = `${server.gameName || 'Unknown'} - ${server.players || 0} players`;
-                    select.appendChild(option);
+            servers.forEach(s => {
+                if (s.online && !s.isShuttingDown) {
+                    const opt = document.createElement('option');
+                    opt.value = s.serverId;
+                    opt.textContent = `${s.gameName || 'Unknown'} - ${s.players || 0} players`;
+                    select.appendChild(opt);
                 }
             });
-
-            if (currentValue && [...select.options].some(opt => opt.value === currentValue)) {
-                select.value = currentValue;
-            }
-
-            if (select.options.length > 1 && !currentValue) {
-                select.selectedIndex = 1;
-                select.dispatchEvent(new Event('change'));
-            }
+            if (currentVal && [...select.options].some(o => o.value === currentVal)) select.value = currentVal;
+            if (select.options.length > 1 && !currentVal) { select.selectedIndex = 1; select.dispatchEvent(new Event('change')); }
         }
 
         function updatePlayerSelect(serverId) {
-            const select = document.getElementById('playerSelect');
-            select.innerHTML = '<option value="">Select a player...</option>';
-            select.innerHTML += '<option value="ALL">👥 ALL PLAYERS</option>';
-
+            const select = $('playerSelect');
+            select.innerHTML = '<option value="">Select a player...</option><option value="ALL">ALL PLAYERS</option>';
             const server = serverData.servers.find(s => String(s.serverId) === String(serverId));
-            console.log('[Safe Hub] Updating player select for server:', serverId, 'Found server:', server);
-
-            if (server && server.playerNames && server.playerNames.length > 0) {
+            if (server?.playerNames?.length) {
                 server.playerNames.forEach(name => {
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = name;
-                    select.appendChild(option);
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name;
+                    select.appendChild(opt);
                 });
-                console.log('[Safe Hub] Added players:', server.playerNames);
-            } else {
-                console.log('[Safe Hub] No players found for server:', serverId);
             }
         }
 
-        function selectServer(serverId) {
-            selectedServerId = serverId;
-            document.getElementById('serverSelect').value = serverId;
-            updatePlayerSelect(serverId);
+        // ============================================================
+        // INTERACTIONS
+        // ============================================================
+        function selectServer(id) {
+            selectedServerId = id;
+            $('serverSelect').value = id;
+            updatePlayerSelect(id);
             switchPage('commands');
-
-            document.querySelectorAll('.server-card').forEach(card => {
-                card.style.borderColor = card.dataset.serverId === serverId ? '#2d6bff' : '';
-                card.style.borderWidth = card.dataset.serverId === serverId ? '2px' : '';
+            document.querySelectorAll('.server-card').forEach(c => {
+                c.style.borderColor = c.dataset.serverId === id ? '#2d6bff' : '';
+                c.style.borderWidth = c.dataset.serverId === id ? '2px' : '';
             });
         }
 
-        function selectPlayerFromCard(playerName, serverId) {
-            selectedPlayer = playerName;
-            if (serverId) {
-                selectServer(serverId);
-            }
-            document.getElementById('playerSelect').value = playerName;
+        function selectPlayerFromCard(name, serverId) {
+            selectedPlayer = name;
+            if (serverId) selectServer(serverId);
+            $('playerSelect').value = name;
             switchPage('commands');
-
-            document.querySelectorAll('.player-tag').forEach(tag => {
-                tag.classList.toggle('selected', tag.textContent === playerName);
-            });
+            document.querySelectorAll('.player-tag').forEach(t => t.classList.toggle('selected', t.textContent === name));
         }
 
         function clearSelection() {
             selectedServerId = null;
             selectedPlayer = null;
-            document.getElementById('serverSelect').value = '';
-            document.getElementById('playerSelect').innerHTML = '<option value="">Select a player...</option><option value="ALL">👥 ALL PLAYERS</option>';
-            document.querySelectorAll('.player-tag').forEach(tag => tag.classList.remove('selected'));
-            document.querySelectorAll('.server-card').forEach(card => {
-                card.style.borderColor = '';
-                card.style.borderWidth = '';
-            });
+            $('serverSelect').value = '';
+            $('playerSelect').innerHTML = '<option value="">Select a player...</option><option value="ALL">ALL PLAYERS</option>';
+            document.querySelectorAll('.player-tag').forEach(t => t.classList.remove('selected'));
+            document.querySelectorAll('.server-card').forEach(c => { c.style.borderColor = ''; c.style.borderWidth = ''; });
         }
 
         function refreshPlayers() {
-            if (selectedServerId) {
-                updatePlayerSelect(selectedServerId);
-            }
+            if (selectedServerId) updatePlayerSelect(selectedServerId);
         }
 
-        function joinServer(serverId) {
-            window.open(`https://www.roblox.com/games/${serverId}`, '_blank');
-        }
+        function joinServer(id) { window.open(`https://www.roblox.com/games/${id}`, '_blank'); }
 
-        function shutdownServer(serverId) {
+        function shutdownServer(id) {
             if (confirm('⚠️ Are you sure you want to shutdown this server?')) {
-                const commandData = {
-                    serverId: serverId,
-                    player: 'SYSTEM',
-                    command: 'shutdown',
-                    extra: '',
-                    reason: 'Server shutdown via dashboard',
-                    timestamp: new Date().toISOString()
-                };
-                sendCommand(commandData);
+                sendCommand({ serverId: id, player: 'SYSTEM', command: 'shutdown', extra: '', reason: 'Server shutdown via dashboard' });
             }
         }
 
-        // ==================== COMMANDS ====================
+        // ============================================================
+        // COMMANDS
+        // ============================================================
         function executeCommand() {
-            const serverId = document.getElementById('serverSelect').value;
-            const player = document.getElementById('playerSelect').value;
-            const command = document.getElementById('commandInput').value;
-            const extra = document.getElementById('extraInput').value;
-            const reason = document.getElementById('reasonInput').value;
+            const serverId = $('serverSelect').value;
+            const player = $('playerSelect').value;
+            const command = $('commandInput').value;
+            const extra = $('extraInput').value;
+            const reason = $('reasonInput').value;
 
-            if (!serverId) {
-                alert('Please select a target server');
-                return;
+            if (!serverId) return alert('Select a target server');
+            if (!player) return alert('Select a target player or "ALL"');
+            if (!command) return alert('Select a command');
+
+            if ((command === 'message' || command === 'teleport' || command === 'tempban') && !extra) {
+                return alert('Please fill in Additional Parameters for this command');
             }
 
-            if (!player) {
-                alert('Please select a target player or "ALL"');
-                return;
-            }
-
-            if (!command) {
-                alert('Please select a command');
-                return;
-            }
-
-            if (command === 'message' && !extra) {
-                alert('Please enter a message in Additional Parameters');
-                return;
-            }
-
-            if (command === 'teleport' && !extra) {
-                alert('Please enter coordinates (x,y,z) in Additional Parameters');
-                return;
-            }
-
-            if (command === 'tempban' && !extra) {
-                alert('Please enter duration in minutes in Additional Parameters');
-                return;
-            }
-
-            const commandData = {
-                serverId: serverId,
-                player: player,
-                command: command,
-                extra: extra,
-                reason: reason || 'No reason provided',
-                timestamp: new Date().toISOString()
-            };
-
-            sendCommand(commandData);
+            sendCommand({ serverId, player, command, extra, reason: reason || 'No reason provided' });
         }
 
-        async function sendCommand(commandData) {
+        async function sendCommand(data) {
             try {
-                console.log('[Safe Hub] Sending command:', commandData);
-
                 const response = await fetch(`${API_URL}/api/command`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(commandData)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...data, timestamp: new Date().toISOString() })
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log('[Safe Hub] Command response:', data);
-
-                const target = commandData.player === 'ALL' ? 'ALL PLAYERS' : commandData.player;
-                alert(`✅ Command "${commandData.command}" sent to ${target} successfully!`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                alert(`✅ Command "${data.command}" sent to ${data.player === 'ALL' ? 'ALL PLAYERS' : data.player} successfully!`);
             } catch (error) {
-                console.error('[Safe Hub] Command failed:', error);
                 alert(`❌ Command failed: ${error.message}`);
             }
-
-            document.getElementById('reasonInput').value = '';
-            if (commandData.command !== 'message' && commandData.command !== 'teleport' && commandData.command !== 'tempban') {
-                document.getElementById('extraInput').value = '';
-            }
+            $('reasonInput').value = '';
+            if (!['message','teleport','tempban'].includes(data.command)) $('extraInput').value = '';
         }
 
+        // ============================================================
+        // PAGE SWITCHING
+        // ============================================================
+        function switchPage(page) {
+            currentPage = page;
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            $(`page-${page}`).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            $(`nav-${page}`).classList.add('active');
+            if (page === 'players') renderPlayers(serverData.servers);
+        }
+
+        // ============================================================
+        // UTILITY
+        // ============================================================
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        function refreshData() {
-            fetchServers();
-        }
+        function refreshData() { fetchServers(); }
 
-        // ==================== PAGE SWITCHING ====================
-        function switchPage(page) {
-            currentPage = page;
-
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + page).classList.add('active');
-
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('nav-' + page).classList.add('active');
-
-            const titles = {
-                servers: ['Servers', 'Monitor all infected game servers in the network'],
-                players: ['Players', 'View all players currently online across the network'],
-                commands: ['Command Center', 'Execute administrative commands on selected servers and players']
-            };
-
-            document.getElementById('pageTitle').textContent = titles[page][0];
-            document.getElementById('pageSubtitle').textContent = titles[page][1];
-
-            if (page === 'players') {
-                renderPlayers(serverData.servers);
-            }
-        }
-
-        // ==================== EVENT LISTENERS ====================
-        document.getElementById('serverSelect').addEventListener('change', function() {
-            if (this.value) {
-                selectedServerId = this.value;
-                updatePlayerSelect(this.value);
-            } else {
-                clearSelection();
-            }
-        });
-
-        document.getElementById('playerSelect').addEventListener('change', function() {
-            selectedPlayer = this.value;
-        });
-
-        // ==================== INITIALIZATION ====================
+        // ============================================================
+        // INIT
+        // ============================================================
         function initializeDashboard() {
-            const keyValid = checkKeyExpiry();
-            if (!keyValid) {
-                document.getElementById('keyExpiryModal').classList.add('active');
-            }
-
+            checkKeyExpiry();
             fetchServers();
             setInterval(fetchServers, 5000);
 
-            console.log('[Safe Hub] Dashboard initialized');
-            console.log('[Safe Hub] Backend URL:', API_URL);
-            console.log('[Safe Hub] Using polling mode (5 second interval)');
-            console.log('[Safe Hub] Key expires in:', KEY_EXPIRY_HOURS, 'hours');
+            $('serverSelect').addEventListener('change', function() {
+                if (this.value) { selectedServerId = this.value; updatePlayerSelect(this.value); }
+                else clearSelection();
+            });
+            $('playerSelect').addEventListener('change', function() { selectedPlayer = this.value; });
+
+            console.log('[Safe Hub] Dashboard initialized — API:', API_URL);
         }
 
-        // ============================================================
-        // Auto-login if key is stored
+        // Auto-login
         window.onload = function() {
             const savedKey = localStorage.getItem('safehub_key');
             const savedValidated = localStorage.getItem('safehub_validated');
-
             if (savedKey && savedValidated === 'true') {
-                document.getElementById('keyInput').value = savedKey;
+                $('keyInput').value = savedKey;
                 validateKey();
             }
         };
