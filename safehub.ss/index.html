@@ -18,7 +18,6 @@
             display: flex;
         }
 
-        /* ========== LOGIN PAGE ========== */
         .login-container {
             display: flex;
             justify-content: center;
@@ -162,7 +161,6 @@
             font-weight: 600;
         }
 
-        /* ========== MAIN DASHBOARD ========== */
         .dashboard {
             display: none;
             width: 100%;
@@ -801,7 +799,6 @@
             font-weight: 600;
         }
 
-        /* ========== MODAL ========== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -847,7 +844,6 @@
             font-size: 13px;
         }
 
-        /* ========== RESPONSIVE ========== */
         @media (max-width: 1100px) {
             .main-grid {
                 grid-template-columns: 1fr 280px;
@@ -1001,7 +997,6 @@
             }
         }
 
-        /* ========== PC WIDTH FIX ========== */
         @media (min-width: 1101px) {
             .main-grid {
                 max-width: 1100px;
@@ -1367,7 +1362,6 @@
                 updateStats(serverData.servers);
                 document.getElementById('lastUpdate').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
 
-                // Clear any previous error message on success
                 const grid = document.getElementById('serverGrid');
                 if (grid.querySelector('.empty-state')?.querySelector('.icon')?.textContent === '❌') {
                     grid.innerHTML = '';
@@ -1375,7 +1369,6 @@
 
             } catch (error) {
                 console.error('[Safe Hub] Error fetching servers:', error);
-                // Only show the error if it's a real connection issue
                 if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
                     document.getElementById('serverGrid').innerHTML = `
                         <div class="empty-state">
@@ -1386,7 +1379,6 @@
                         </div>
                     `;
                 } else {
-                    // For other errors, just log them and show empty state
                     document.getElementById('serverGrid').innerHTML = `
                         <div class="empty-state">
                             <div class="icon">📡</div>
