@@ -1247,13 +1247,8 @@
             loginBtn.textContent = 'Validating...';
 
             try {
-                const response = await fetch(`${API_URL}/api/validate`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ key: key })
-                });
+                // Fetch all keys from the backend
+                const response = await fetch(`${API_URL}/api/keys`);
 
                 if (!response.ok) {
                     throw new Error(`Server responded with status: ${response.status}`);
@@ -1261,16 +1256,41 @@
 
                 const data = await response.json();
 
-                if (data.valid) {
+                // Check if the entered key exists in the keys array
+                const keys = data.keys || [];
+                const foundKey = keys.find(k => k.key === key);
+
+                if (foundKey) {
+                    // Check if key is active and not expired
+                    const expiry = new Date(foundKey.expires_at);
+                    const now = new Date();
+
+                    if (!foundKey.active) {
+                        statusEl.textContent = 'Key has been revoked.';
+                        statusEl.className = 'error show';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Access Dashboard';
+                        return;
+                    }
+
+                    if (expiry < now) {
+                        statusEl.textContent = 'Key has expired. Please generate a new one.';
+                        statusEl.className = 'error show';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Access Dashboard';
+                        return;
+                    }
+
+                    // Key is valid!
                     statusEl.textContent = '✅ Key validated successfully! Loading dashboard...';
                     statusEl.className = 'success show';
                     validated = true;
 
                     localStorage.setItem('safehub_key', key);
                     localStorage.setItem('safehub_validated', 'true');
-                    const expiry = new Date();
-                    expiry.setHours(expiry.getHours() + KEY_EXPIRY_HOURS);
-                    localStorage.setItem('safehub_key_expiry', expiry.toISOString());
+                    const keyExpiry = new Date();
+                    keyExpiry.setHours(keyExpiry.getHours() + KEY_EXPIRY_HOURS);
+                    localStorage.setItem('safehub_key_expiry', keyExpiry.toISOString());
 
                     setTimeout(() => {
                         document.getElementById('loginContainer').style.display = 'none';
@@ -1278,7 +1298,7 @@
                         initializeDashboard();
                     }, 1000);
                 } else {
-                    statusEl.textContent = data.reason || 'Invalid key. Please try again.';
+                    statusEl.textContent = 'Invalid key. Please check and try again.';
                     statusEl.className = 'error show';
                     loginBtn.disabled = false;
                     loginBtn.textContent = 'Access Dashboard';
