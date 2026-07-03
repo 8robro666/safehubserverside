@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* ... (keep all your existing styles) ... */
+    /* All your existing CSS here - keep it exactly as you had it */
     :root {
       --bg: #020617;
       --surface: #0b1221;
@@ -1300,11 +1300,10 @@
   </div>
 
   <script>
-    // ==================================================
-    // CONFIGURATION
-    // ==================================================
-    // Use the current domain as API URL
-    const API_URL = window.location.origin;
+// ==================================================
+// CONFIGURATION - Point to Railway backend
+// ==================================================
+    const API_URL = 'https://safehub-backend-production.up.railway.app';
     
     let API_REACHABLE = false;
     const KEY_EXPIRY_HOURS = 24;
