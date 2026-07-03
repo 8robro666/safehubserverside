@@ -1303,13 +1303,9 @@
     // ==================================================
     // CONFIGURATION
     // ==================================================
-    // Try multiple possible API URLs
-    const API_URLS = [
-           'https://safehub-backend-production.up.railway.app',
-           'https://safehub-backend-production.up.railway.app' // Same URL as fallback
-    ];
+    // Use the current domain as API URL
+    const API_URL = window.location.origin;
     
-    let API_URL = API_URLS[0];
     let API_REACHABLE = false;
     const KEY_EXPIRY_HOURS = 24;
     const MAINTENANCE_MODE = false;
@@ -1369,32 +1365,34 @@
       statusEl.className = 'api-status checking';
       statusEl.textContent = 'Checking...';
       
-      for (const url of API_URLS) {
-        try {
-          const response = await fetch(`${url}/test`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            signal: AbortSignal.timeout(5000)
-          });
-          
-          if (response.ok) {
-            API_URL = url;
-            API_REACHABLE = true;
-            statusEl.className = 'api-status online';
-            statusEl.textContent = 'Online';
-            addConsoleLog(`✅ Connected to API: ${API_URL}`, 'success');
-            return true;
-          }
-        } catch (e) {
-          console.log(`Failed to connect to ${url}: ${e.message}`);
+      try {
+        const response = await fetch(`${API_URL}/test`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(5000)
+        });
+        
+        if (response.ok) {
+          API_REACHABLE = true;
+          statusEl.className = 'api-status online';
+          statusEl.textContent = 'Online';
+          addConsoleLog(`✅ Connected to API: ${API_URL}`, 'success');
+          return true;
+        } else {
+          API_REACHABLE = false;
+          statusEl.className = 'api-status offline';
+          statusEl.textContent = 'Offline';
+          addConsoleLog('❌ API responded but with error status', 'error');
+          return false;
         }
+      } catch (e) {
+        console.log(`Failed to connect to API: ${e.message}`);
+        API_REACHABLE = false;
+        statusEl.className = 'api-status offline';
+        statusEl.textContent = 'Offline';
+        addConsoleLog(`❌ Cannot connect to API: ${e.message}`, 'error');
+        return false;
       }
-      
-      API_REACHABLE = false;
-      statusEl.className = 'api-status offline';
-      statusEl.textContent = 'Offline';
-      addConsoleLog('❌ Cannot connect to any API endpoint. Please check your backend.', 'error');
-      return false;
     }
 
     // ==================================================
@@ -1633,7 +1631,8 @@
         const data = await response.json();
         
         let servers = data.servers ? data.servers : (Array.isArray(data) ? data : []);
-        servers = servers.filter(s => s.online === true && s.players > 0);
+        // Filter out empty servers but keep them visible
+        servers = servers.filter(s => s.serverId);
         
         serverData = { servers: servers };
         renderServers(serverData.servers);
@@ -1850,58 +1849,58 @@
       addConsoleLog(`Switched to ${tab} tab`, 'info');
     }
 
-async function executeScript() {
-    const serverId = $('execServerSelect').value;
-    const player = $('execPlayerSelect').value;
-    let script = $('scriptInput').value.trim();
-    
-    if (!serverId) {
+    async function executeScript() {
+      const serverId = $('execServerSelect').value;
+      const player = $('execPlayerSelect').value;
+      let script = $('scriptInput').value.trim();
+      
+      if (!serverId) {
         addConsoleLog('ERROR: Select a target server', 'error');
         return alert('Select a target server');
-    }
-    if (!script) {
+      }
+      if (!script) {
         addConsoleLog('ERROR: Enter a script to execute', 'error');
         return alert('Enter a script to execute');
-    }
-    
-    const playerName = player || linkedRobloxUser || 'username';
-    script = script.replace(/username/g, playerName).replace(/usernamehere/g, playerName).replace(/urusernamehere/g, playerName);
-    
-    addConsoleLog(`Executing script on ${serverId}`, 'info');
-    
-    try {
+      }
+      
+      const playerName = player || linkedRobloxUser || 'username';
+      script = script.replace(/username/g, playerName).replace(/usernamehere/g, playerName).replace(/urusernamehere/g, playerName);
+      
+      addConsoleLog(`Executing script on ${serverId}`, 'info');
+      
+      try {
         const response = await fetch(`${API_URL}/api/execute/direct`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                serverId: serverId,
-                player: player || 'ALL',
-                script: script
-            })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serverId: serverId,
+            player: player || 'ALL',
+            script: script
+          })
         });
         
         const result = await response.json();
         
         if (result.success) {
-            addConsoleLog(`✅ Script executed successfully!`, 'success');
-            if (result.output) {
-                const lines = result.output.split('\n');
-                lines.forEach(line => {
-                    if (line.trim()) {
-                        addConsoleLog(`📝 ${line}`, 'info');
-                    }
-                });
-            }
-            alert('✅ Script executed! Check the console for output.');
+          addConsoleLog(`✅ Script executed successfully!`, 'success');
+          if (result.output) {
+            const lines = result.output.split('\n');
+            lines.forEach(line => {
+              if (line.trim()) {
+                addConsoleLog(`📝 ${line}`, 'info');
+              }
+            });
+          }
+          alert('✅ Script executed! Check the console for output.');
         } else {
-            addConsoleLog(`❌ Script failed: ${result.message}`, 'error');
-            alert(`Script failed: ${result.message}`);
+          addConsoleLog(`❌ Script failed: ${result.message}`, 'error');
+          alert(`Script failed: ${result.message}`);
         }
-    } catch (error) {
+      } catch (error) {
         addConsoleLog(`❌ Network error: ${error.message}`, 'error');
         alert(`Script failed: ${error.message}`);
+      }
     }
-}
 
     function clearScript() {
       $('scriptInput').value = '';
