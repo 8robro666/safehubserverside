@@ -1,0 +1,18 @@
+# wrangler.toml
+name = "safehub-frontend"
+compatibility_date = "2024-11-18"
+
+[assets]
+directory = "./"
+binding = "ASSETS"
+
+# Exclude node_modules from being uploaded
+[assets.exclude]
+patterns = [
+    "node_modules/**",
+    "*.py",
+    "*.pyc",
+    "__pycache__/**",
+    "*.json",
+    "!package.json"
+]
