@@ -1848,10 +1848,10 @@
       addConsoleLog(`Switched to ${tab} tab`, 'info');
     }
 
-    async function executeScript() {
-      const serverId = $('execServerSelect').value;
-      const player = $('execPlayerSelect').value;
-      let script = $('scriptInput').value.trim();
+     async function executeScript() {
+          const serverId = $('execServerSelect').value;
+          const player = $('execPlayerSelect').value;
+          let script = $('scriptInput').value.trim();
       
       if (!serverId) {
         addConsoleLog('ERROR: Select a target server', 'error');
@@ -1867,16 +1867,16 @@
       
       addConsoleLog(`Executing script on ${serverId}`, 'info');
       
-      try {
-        const response = await fetch(`${API_URL}/api/execute/direct`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            serverId: serverId,
-            player: player || 'ALL',
-            script: script
-          })
-        });
+        try {
+           const response = await fetch(`${API_URL}/api/execute`, {  // <-- CHANGE THIS LINE
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+           serverId: serverId,
+           player: player || 'ALL',
+           script: script
+       })
+     });
         
         const result = await response.json();
         
